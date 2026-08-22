@@ -3,20 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'router.dart';
 
-class FitForgeApp extends StatelessWidget {
+class FitForgeApp extends ConsumerWidget {
   const FitForgeApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ProviderScope(
-      child: MaterialApp.router(
-        title: 'FitForge',
-        debugShowCheckedModeBanner: false,
-        routerConfig: appRouter,
-        theme: ThemeData(
-          useMaterial3: true,
-          brightness: Brightness.dark,
-        ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
+      title: 'FitForge',
+      debugShowCheckedModeBanner: false,
+      routerConfig: router,
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorSchemeSeed: Colors.green,
       ),
     );
   }
