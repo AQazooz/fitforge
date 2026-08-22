@@ -22,23 +22,13 @@ class HomePage extends ConsumerWidget {
           IconButton(onPressed: () => context.push('/workouts'), icon: const Icon(Icons.fitness_center)),
           IconButton(onPressed: () => context.push('/progress'), icon: const Icon(Icons.insights)),
           IconButton(onPressed: () => context.push('/nutrition'), icon: const Icon(Icons.restaurant)),
-          IconButton(
-            tooltip: 'Sign out',
-            onPressed: () async {
-              await ref.read(authControllerProvider).signOut();
-              if (context.mounted) context.go('/login');
-            },
-            icon: const Icon(Icons.logout),
-          ),
+          IconButton(tooltip: 'Sign out', onPressed: () async { await ref.read(authControllerProvider).signOut(); if (context.mounted) context.go('/login'); }, icon: const Icon(Icons.logout)),
         ],
       ),
       body: snapshot.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(child: FilledButton(onPressed: () => ref.invalidate(dashboardSnapshotProvider), child: const Text('Retry'))),
-        data: (data) => RefreshIndicator(
-          onRefresh: () => ref.refresh(dashboardSnapshotProvider.future),
-          child: _DashboardContent(snapshot: data),
-        ),
+        data: (data) => RefreshIndicator(onRefresh: () => ref.refresh(dashboardSnapshotProvider.future), child: _DashboardContent(snapshot: data)),
       ),
     );
   }
@@ -66,20 +56,12 @@ class _DashboardContent extends StatelessWidget {
         if (biometrics == null)
           const Card(child: Padding(padding: EdgeInsets.all(20), child: Text('No body measurement yet. Add your first measurement to start tracking progress.')))
         else
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.6,
-            children: [
-              _MetricCard(label: 'Weight', value: _number(biometrics['weight_kg'], ' kg')),
-              _MetricCard(label: 'Body fat', value: _number(biometrics['body_fat_pct'], '%')),
-              _MetricCard(label: 'Muscle mass', value: _number(biometrics['muscle_mass_kg'], ' kg')),
-              _MetricCard(label: 'BMI', value: _number(biometrics['bmi'], '')),
-            ],
-          ),
+          GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.6, children: [
+            _MetricCard(label: 'Weight', value: _number(biometrics['weight_kg'], ' kg')),
+            _MetricCard(label: 'Body fat', value: _number(biometrics['body_fat_pct'], '%')),
+            _MetricCard(label: 'Muscle mass', value: _number(biometrics['muscle_mass_kg'], ' kg')),
+            _MetricCard(label: 'BMI', value: _number(biometrics['bmi'], '')),
+          ]),
         const SizedBox(height: 28),
         Text('Quick actions', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 12),
@@ -88,6 +70,8 @@ class _DashboardContent extends StatelessWidget {
         _ActionCard(icon: Icons.insights, title: 'View progress', subtitle: 'Review workout history and performance.', onTap: () => context.push('/progress')),
         const SizedBox(height: 12),
         _ActionCard(icon: Icons.restaurant, title: 'Log nutrition', subtitle: 'Track calories and macros for today.', onTap: () => context.push('/nutrition')),
+        const SizedBox(height: 12),
+        _ActionCard(icon: Icons.auto_awesome, title: 'Nutrition Coach', subtitle: 'Generate a personalized starting target.', onTap: () => context.push('/nutrition-coach')),
       ],
     );
   }
@@ -119,10 +103,7 @@ class _MetricCard extends StatelessWidget {
 
 class _ActionCard extends StatelessWidget {
   const _ActionCard({required this.icon, required this.title, required this.subtitle, this.onTap});
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTap;
+  final IconData icon; final String title; final String subtitle; final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) => Card(child: ListTile(leading: Icon(icon), title: Text(title), subtitle: Text(subtitle), trailing: const Icon(Icons.chevron_right), onTap: onTap));
 }
