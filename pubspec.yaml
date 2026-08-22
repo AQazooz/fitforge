@@ -1,0 +1,24 @@
+name: fitforge
+description: Production-oriented Flutter fitness tracking app powered by Supabase.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.12.0 <4.0.0"
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^3.4.2
+  go_router: ^17.5.0
+  supabase_flutter: ^2.17.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
