@@ -29,13 +29,21 @@ class BiometricsRepository {
     double? waistCm,
     String? notes,
   }) async {
+    final profile = await _client
+        .from('users_profiles')
+        .select('height_cm')
+        .eq('id', _userId)
+        .single();
+    final heightCm = (profile['height_cm'] as num?)?.toDouble();
+    final bmi = heightCm == null || heightCm <= 0 ? null : weightKg / ((heightCm / 100) * (heightCm / 100));
+
     await _client.from('athlete_biometrics').insert({
       'user_id': _userId,
       'measured_at': measuredAt.toUtc().toIso8601String(),
       'weight_kg': weightKg,
       'body_fat_pct': bodyFatPct,
       'muscle_mass_kg': muscleMassKg,
-      'bmi': null,
+      'bmi': bmi,
       'waist_cm': waistCm,
       'notes': notes?.trim(),
     });

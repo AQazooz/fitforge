@@ -8,7 +8,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/config/supabase_config.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/register_page.dart';
+import '../features/biometrics/presentation/biometrics_page.dart';
 import '../features/dashboard/presentation/home_page.dart';
+import '../features/nutrition/presentation/food_search_page.dart';
 import '../features/nutrition/presentation/nutrition_coach_page.dart';
 import '../features/nutrition/presentation/nutrition_page.dart';
 import '../features/profile/data/profile_repository.dart';
@@ -29,7 +31,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isAuthRoute = location == '/login' || location == '/register';
       final isProfileRoute = location == '/profile-setup';
-      final isProtectedRoute = location == '/home' || location == '/workouts' || location == '/progress' || location == '/nutrition' || location == '/nutrition-coach';
+      final isProtectedRoute = {
+        '/home', '/workouts', '/progress', '/nutrition', '/nutrition-coach', '/foods', '/biometrics'
+      }.contains(location);
 
       if (!isAuthenticated) return isAuthRoute ? null : '/login';
       if (isAuthRoute) {
@@ -55,6 +59,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/progress', builder: (_, __) => const ProgressPage()),
       GoRoute(path: '/nutrition', builder: (_, __) => const NutritionPage()),
       GoRoute(path: '/nutrition-coach', builder: (_, __) => const NutritionCoachPage()),
+      GoRoute(path: '/foods', builder: (_, __) => const FoodSearchPage()),
+      GoRoute(path: '/biometrics', builder: (_, __) => const BiometricsPage()),
     ],
     errorBuilder: (_, state) => Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
   );
