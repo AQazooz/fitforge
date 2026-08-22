@@ -9,24 +9,46 @@ import '../core/config/supabase_config.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/register_page.dart';
 import '../features/dashboard/presentation/home_page.dart';
+import '../features/profile/data/profile_repository.dart';
 import '../features/profile/presentation/profile_setup_page.dart';
+
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
+  return ProfileRepository(SupabaseConfig.client!);
+});
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refresh = _AuthRefreshNotifier();
   final router = GoRouter(
     initialLocation: '/login',
     refreshListenable: refresh,
-    redirect: (context, state) {
-      final session = SupabaseConfig.client?.auth.currentSession;
+    redirect: (context, state) async {
+      final client = SupabaseConfig.client;
+      final session = client?.auth.currentSession;
       final isAuthenticated = session != null;
-      final isAuthRoute = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register';
-      final isProfileRoute = state.matchedLocation == '/profile-setup';
+      final location = state.matchedLocation;
+      final isAuthRoute = location == '/login' || location == '/register';
+      final isProfileRoute = location == '/profile-setup';
 
-      if (!isAuthenticated && !isAuthRoute) return '/login';
-      if (isAuthenticated && isAuthRoute) return '/profile-setup';
-      if (!isAuthenticated && isProfileRoute) return '/login';
-      return null;
+      if (!isAuthenticated) {
+        return isAuthRoute ? null : '/login';
+      }
+
+      if (isAuthRoute) {
+        final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
+        return hasProfile ? '/home' : '/profile-setup';
+      }
+
+      if (isProfileRoute) {
+        final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
+        return hasProfile ? '/home' : null;
+      }
+
+      if (location == '/home') {
+        final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
+        return hasProfile ? null : '/profile-setup';
+      }
+
+      return '/home';
     },
     routes: [
       GoRoute(
