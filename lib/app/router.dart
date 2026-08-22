@@ -11,10 +11,9 @@ import '../features/auth/presentation/register_page.dart';
 import '../features/dashboard/presentation/home_page.dart';
 import '../features/profile/data/profile_repository.dart';
 import '../features/profile/presentation/profile_setup_page.dart';
+import '../features/workouts/presentation/workouts_page.dart';
 
-final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
-  return ProfileRepository(SupabaseConfig.client!);
-});
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) => ProfileRepository(SupabaseConfig.client!));
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refresh = _AuthRefreshNotifier();
@@ -23,15 +22,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     redirect: (context, state) async {
       final client = SupabaseConfig.client;
-      final session = client?.auth.currentSession;
-      final isAuthenticated = session != null;
+      final isAuthenticated = client?.auth.currentSession != null;
       final location = state.matchedLocation;
       final isAuthRoute = location == '/login' || location == '/register';
       final isProfileRoute = location == '/profile-setup';
+      final isWorkoutRoute = location == '/workouts';
 
-      if (!isAuthenticated) {
-        return isAuthRoute ? null : '/login';
-      }
+      if (!isAuthenticated) return isAuthRoute ? null : '/login';
 
       if (isAuthRoute) {
         final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
@@ -43,7 +40,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return hasProfile ? '/home' : null;
       }
 
-      if (location == '/home') {
+      if (location == '/home' || isWorkoutRoute) {
         final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
         return hasProfile ? null : '/profile-setup';
       }
@@ -51,26 +48,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return '/home';
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        path: '/profile-setup',
-        builder: (context, state) => const ProfileSetupPage(),
-      ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomePage(),
-      ),
+      GoRoute(path: '/login', builder: (_, __) => const LoginPage()),
+      GoRoute(path: '/register', builder: (_, __) => const RegisterPage()),
+      GoRoute(path: '/profile-setup', builder: (_, __) => const ProfileSetupPage()),
+      GoRoute(path: '/home', builder: (_, __) => const HomePage()),
+      GoRoute(path: '/workouts', builder: (_, __) => const WorkoutsPage()),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(child: Text('Page not found: ${state.uri}')),
-    ),
+    errorBuilder: (_, state) => Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
   );
 
   ref.onDispose(() {
@@ -84,9 +68,7 @@ class _AuthRefreshNotifier extends ChangeNotifier {
   _AuthRefreshNotifier() {
     final client = SupabaseConfig.client;
     if (client == null) return;
-    _subscription = client.auth.onAuthStateChange.listen((_) {
-      notifyListeners();
-    });
+    _subscription = client.auth.onAuthStateChange.listen((_) => notifyListeners());
   }
 
   StreamSubscription<AuthState>? _subscription;
