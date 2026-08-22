@@ -11,6 +11,7 @@ import '../features/auth/presentation/register_page.dart';
 import '../features/dashboard/presentation/home_page.dart';
 import '../features/profile/data/profile_repository.dart';
 import '../features/profile/presentation/profile_setup_page.dart';
+import '../features/workouts/presentation/progress_page.dart';
 import '../features/workouts/presentation/workouts_page.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) => ProfileRepository(SupabaseConfig.client!));
@@ -26,25 +27,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isAuthRoute = location == '/login' || location == '/register';
       final isProfileRoute = location == '/profile-setup';
-      final isWorkoutRoute = location == '/workouts';
+      final isProtectedRoute = location == '/home' || location == '/workouts' || location == '/progress';
 
       if (!isAuthenticated) return isAuthRoute ? null : '/login';
-
       if (isAuthRoute) {
         final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
         return hasProfile ? '/home' : '/profile-setup';
       }
-
       if (isProfileRoute) {
         final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
         return hasProfile ? '/home' : null;
       }
-
-      if (location == '/home' || isWorkoutRoute) {
+      if (isProtectedRoute) {
         final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
         return hasProfile ? null : '/profile-setup';
       }
-
       return '/home';
     },
     routes: [
@@ -53,6 +50,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/profile-setup', builder: (_, __) => const ProfileSetupPage()),
       GoRoute(path: '/home', builder: (_, __) => const HomePage()),
       GoRoute(path: '/workouts', builder: (_, __) => const WorkoutsPage()),
+      GoRoute(path: '/progress', builder: (_, __) => const ProgressPage()),
     ],
     errorBuilder: (_, state) => Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
   );
