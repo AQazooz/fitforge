@@ -1,0 +1,15 @@
+-- Reference migration for the initial FitForge schema.
+-- The schema is already deployed to Supabase project ref nhiuqjuwbahiffwltnzd.
+-- Keep future schema changes as reviewed migrations and verify with Supabase advisors.
+
+-- Domain tables:
+-- users_profiles
+-- athlete_biometrics
+-- exercises
+-- workout_plans
+-- workout_plan_days
+-- workout_plan_exercises
+-- workout_logs
+-- workout_log_sets
+-- nutrition_targets
+-- nutrition_logs
