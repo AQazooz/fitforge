@@ -30,8 +30,27 @@ Supabase project ref: `nhiuqjuwbahiffwltnzd`
 
 The database contains the initial FitForge domain model for profiles, biometrics, exercises, workout plans/logs, and nutrition tracking. RLS is enabled for application tables.
 
-## Secrets
+## Flutter configuration
 
-Never commit Supabase secret/service-role keys. The Flutter client must use only a publishable/anon-compatible public key.
+The Flutter client reads only public Supabase configuration at runtime:
 
-Local environment variables should be provided through `--dart-define` or a local `.env` workflow that is excluded from git.
+```bash
+flutter run \
+  --dart-define=SUPABASE_URL=https://nhiuqjuwbahiffwltnzd.supabase.co \
+  --dart-define=SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
+```
+
+Never commit a Supabase secret/service-role key.
+
+## Current foundation
+
+- Supabase initialization
+- Riverpod `ProviderScope`
+- GoRouter
+- Supabase Auth repository
+- Login screen
+- Registration screen
+- Initial home screen
+- Runtime environment configuration using `--dart-define`
+
+Authentication is not yet route-guarded; the next foundation step is an auth-aware router refresh with protected routes and profile onboarding.
