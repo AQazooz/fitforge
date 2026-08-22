@@ -1,10 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NutritionDay {
-  const NutritionDay({
-    required this.target,
-    required this.logs,
-  });
+  const NutritionDay({required this.target, required this.logs});
 
   final Map<String, dynamic>? target;
   final List<Map<String, dynamic>> logs;
@@ -53,10 +50,25 @@ class NutritionRepository {
         .lt('consumed_at', end.toUtc().toIso8601String())
         .order('consumed_at', ascending: false);
 
-    return NutritionDay(
-      target: target,
-      logs: List<Map<String, dynamic>>.from(logs),
-    );
+    return NutritionDay(target: target, logs: List<Map<String, dynamic>>.from(logs));
+  }
+
+  Future<Map<String, dynamic>> loadNutritionContext() async {
+    final profile = await _client
+        .from('users_profiles')
+        .select('date_of_birth, sex, height_cm, training_level, goal')
+        .eq('id', _userId)
+        .single();
+
+    final biometrics = await _client
+        .from('athlete_biometrics')
+        .select('weight_kg, body_fat_pct, measured_at')
+        .eq('user_id', _userId)
+        .order('measured_at', ascending: false)
+        .limit(1)
+        .maybeSingle();
+
+    return {'profile': Map<String, dynamic>.from(profile), 'biometrics': biometrics};
   }
 
   Future<void> saveTarget({
@@ -67,15 +79,18 @@ class NutritionRepository {
     required double fatG,
     required double fiberG,
   }) async {
-    await _client.from('nutrition_targets').insert({
-      'user_id': _userId,
-      'effective_from': _dateOnly(effectiveFrom),
-      'calories': calories,
-      'protein_g': proteinG,
-      'carbs_g': carbsG,
-      'fat_g': fatG,
-      'fiber_g': fiberG,
-    });
+    await _client.from('nutrition_targets').upsert(
+      {
+        'user_id': _userId,
+        'effective_from': _dateOnly(effectiveFrom),
+        'calories': calories,
+        'protein_g': proteinG,
+        'carbs_g': carbsG,
+        'fat_g': fatG,
+        'fiber_g': fiberG,
+      },
+      onConflict: 'user_id,effective_from',
+    );
   }
 
   Future<void> addFood({
