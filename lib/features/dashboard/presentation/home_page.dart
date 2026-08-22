@@ -20,6 +20,7 @@ class HomePage extends ConsumerWidget {
         title: const Text('FitForge'),
         actions: [
           IconButton(onPressed: () => context.push('/workouts'), icon: const Icon(Icons.fitness_center)),
+          IconButton(onPressed: () => context.push('/progress'), icon: const Icon(Icons.insights)),
           IconButton(
             tooltip: 'Sign out',
             onPressed: () async {
@@ -83,9 +84,9 @@ class _DashboardContent extends StatelessWidget {
         const SizedBox(height: 12),
         _ActionCard(icon: Icons.fitness_center, title: 'Start workout', subtitle: 'Open your training plan.', onTap: () => context.push('/workouts')),
         const SizedBox(height: 12),
-        const _ActionCard(icon: Icons.restaurant, title: 'Log nutrition', subtitle: 'Calories and macros will be available here.'),
+        _ActionCard(icon: Icons.insights, title: 'View progress', subtitle: 'Review workout history and performance.', onTap: () => context.push('/progress')),
         const SizedBox(height: 12),
-        const _ActionCard(icon: Icons.insights, title: 'View progress', subtitle: 'Track your body and workout progress over time.'),
+        const _ActionCard(icon: Icons.restaurant, title: 'Log nutrition', subtitle: 'Calories and macros will be available here.'),
       ],
     );
   }
