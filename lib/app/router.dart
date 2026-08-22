@@ -9,6 +9,7 @@ import '../core/config/supabase_config.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/register_page.dart';
 import '../features/dashboard/presentation/home_page.dart';
+import '../features/nutrition/presentation/nutrition_coach_page.dart';
 import '../features/nutrition/presentation/nutrition_page.dart';
 import '../features/profile/data/profile_repository.dart';
 import '../features/profile/presentation/profile_setup_page.dart';
@@ -28,10 +29,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isAuthRoute = location == '/login' || location == '/register';
       final isProfileRoute = location == '/profile-setup';
-      final isProtectedRoute = location == '/home' ||
-          location == '/workouts' ||
-          location == '/progress' ||
-          location == '/nutrition';
+      final isProtectedRoute = location == '/home' || location == '/workouts' || location == '/progress' || location == '/nutrition' || location == '/nutrition-coach';
 
       if (!isAuthenticated) return isAuthRoute ? null : '/login';
       if (isAuthRoute) {
@@ -56,6 +54,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/workouts', builder: (_, __) => const WorkoutsPage()),
       GoRoute(path: '/progress', builder: (_, __) => const ProgressPage()),
       GoRoute(path: '/nutrition', builder: (_, __) => const NutritionPage()),
+      GoRoute(path: '/nutrition-coach', builder: (_, __) => const NutritionCoachPage()),
     ],
     errorBuilder: (_, state) => Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
   );
