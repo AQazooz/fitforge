@@ -13,9 +13,17 @@ concurrency:
   group: flutter-release-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+  ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+  ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+  ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+  ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
 jobs:
   android-release:
-    name: Build Android release artifacts
+    name: Build signed Android release artifacts
     runs-on: ubuntu-latest
 
     steps:
@@ -28,6 +36,16 @@ jobs:
           flutter-version: '3.35.0'
           channel: stable
           cache: true
+
+      - name: Validate release secrets
+        shell: bash
+        run: |
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_PUBLISHABLE_KEY"
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
 
       - name: Generate Android platform project
         run: flutter create --platforms=android --org com.forgelabs --project-name fitforge .
@@ -42,15 +60,58 @@ jobs:
         run: flutter test
 
       - name: Build Android App Bundle
-        run: flutter build appbundle --release
+        run: |
+          flutter build appbundle --release \
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_PUBLISHABLE_KEY="$SUPABASE_PUBLISHABLE_KEY"
 
       - name: Build split APKs
-        run: flutter build apk --release --split-per-abi
+        run: |
+          flutter build apk --release --split-per-abi \
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_PUBLISHABLE_KEY="$SUPABASE_PUBLISHABLE_KEY"
+
+      - name: Prepare Android signing key
+        shell: bash
+        run: |
+          mkdir -p android/keystore
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/keystore/fitforge-upload.jks
+
+      - name: Sign App Bundle
+        shell: bash
+        run: |
+          jarsigner \
+            -keystore android/keystore/fitforge-upload.jks \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -keypass "$ANDROID_KEY_PASSWORD" \
+            build/app/outputs/bundle/release/app-release.aab \
+            "$ANDROID_KEY_ALIAS"
+
+      - name: Sign APKs
+        shell: bash
+        run: |
+          BUILD_TOOLS=$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+          APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
+          mkdir -p build/signed-apks
+          for apk in build/app/outputs/flutter-apk/*-release.apk; do
+            name=$(basename "$apk")
+            "$APKSIGNER" sign \
+              --ks android/keystore/fitforge-upload.jks \
+              --ks-pass "pass:$ANDROID_KEYSTORE_PASSWORD" \
+              --ks-key-alias "$ANDROID_KEY_ALIAS" \
+              --key-pass "pass:$ANDROID_KEY_PASSWORD" \
+              --out "build/signed-apks/$name" \
+              "$apk"
+          done
 
       - name: Verify release artifacts
         run: |
           test -f build/app/outputs/bundle/release/app-release.aab
-          test -n "$(find build/app/outputs/flutter-apk -name '*-release.apk' -print -quit)"
+          test -n "$(find build/signed-apks -name '*-release.apk' -print -quit)"
+
+      - name: Remove signing key from workspace
+        if: always()
+        run: rm -f android/keystore/fitforge-upload.jks
 
       - name: Upload Android App Bundle
         uses: actions/upload-artifact@v4
@@ -60,10 +121,10 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload Android APKs
+      - name: Upload signed Android APKs
         uses: actions/upload-artifact@v4
         with:
           name: fitforge-android-apks-${{ github.ref_name }}
-          path: build/app/outputs/flutter-apk/*-release.apk
+          path: build/signed-apks/*-release.apk
           if-no-files-found: error
           retention-days: 14
