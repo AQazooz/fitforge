@@ -5,6 +5,20 @@ class ProfileRepository {
 
   final SupabaseClient _client;
 
+  Future<Map<String, dynamic>?> getCurrentProfile() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return null;
+
+    return _client
+        .from('users_profiles')
+        .select('id, display_name, avatar_url, date_of_birth, sex, height_cm, unit_system, training_level, goal')
+        .eq('id', userId)
+        .maybeSingle();
+  }
+
+  Future<bool> hasCurrentProfile() async =>
+      (await getCurrentProfile()) != null;
+
   Future<void> upsertProfile({
     required String displayName,
     required DateTime? dateOfBirth,
