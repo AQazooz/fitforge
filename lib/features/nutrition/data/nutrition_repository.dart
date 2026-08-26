@@ -33,41 +33,16 @@ class NutritionRepository {
     final start = DateTime(day.year, day.month, day.day);
     final end = start.add(const Duration(days: 1));
 
-    final target = await _client
-        .from('nutrition_targets')
-        .select('id, effective_from, calories, protein_g, carbs_g, fat_g, fiber_g')
-        .eq('user_id', _userId)
-        .lte('effective_from', _dateOnly(start))
-        .order('effective_from', ascending: false)
-        .limit(1)
-        .maybeSingle();
+    final target = await _client.from('nutrition_targets').select('id, effective_from, calories, protein_g, carbs_g, fat_g, fiber_g').eq('user_id', _userId).lte('effective_from', _dateOnly(start)).order('effective_from', ascending: false).limit(1).maybeSingle();
 
-    final logs = await _client
-        .from('nutrition_logs')
-        .select('id, consumed_at, meal_type, food_name, calories, protein_g, carbs_g, fat_g, serving_size')
-        .eq('user_id', _userId)
-        .gte('consumed_at', start.toUtc().toIso8601String())
-        .lt('consumed_at', end.toUtc().toIso8601String())
-        .order('consumed_at', ascending: false);
+    final logs = await _client.from('nutrition_logs').select('id, consumed_at, meal_type, food_name, calories, protein_g, carbs_g, fat_g, serving_size').eq('user_id', _userId).gte('consumed_at', start.toUtc().toIso8601String()).lt('consumed_at', end.toUtc().toIso8601String()).order('consumed_at', ascending: false);
 
     return NutritionDay(target: target, logs: List<Map<String, dynamic>>.from(logs));
   }
 
   Future<Map<String, dynamic>> loadNutritionContext() async {
-    final profile = await _client
-        .from('users_profiles')
-        .select('date_of_birth, sex, height_cm, training_level, goal')
-        .eq('id', _userId)
-        .single();
-
-    final biometrics = await _client
-        .from('athlete_biometrics')
-        .select('weight_kg, body_fat_pct, measured_at')
-        .eq('user_id', _userId)
-        .order('measured_at', ascending: false)
-        .limit(1)
-        .maybeSingle();
-
+    final profile = await _client.from('users_profiles').select('date_of_birth, sex, height_cm, training_level, goal').eq('id', _userId).single();
+    final biometrics = await _client.from('athlete_biometrics').select('weight_kg, body_fat_pct, measured_at').eq('user_id', _userId).order('measured_at', ascending: false).limit(1).maybeSingle();
     return {'profile': Map<String, dynamic>.from(profile), 'biometrics': biometrics};
   }
 
@@ -79,18 +54,12 @@ class NutritionRepository {
     required double fatG,
     required double fiberG,
   }) async {
-    await _client.from('nutrition_targets').upsert(
-      {
-        'user_id': _userId,
-        'effective_from': _dateOnly(effectiveFrom),
-        'calories': calories,
-        'protein_g': proteinG,
-        'carbs_g': carbsG,
-        'fat_g': fatG,
-        'fiber_g': fiberG,
-      },
-      onConflict: 'user_id,effective_from',
-    );
+    if (calories < 500 || calories > 15000) throw ArgumentError.value(calories, 'calories', 'must be between 500 and 15000');
+    _validateMacro(proteinG, 'proteinG');
+    _validateMacro(carbsG, 'carbsG');
+    _validateMacro(fatG, 'fatG');
+    _validateMacro(fiberG, 'fiberG');
+    await _client.from('nutrition_targets').upsert({'user_id': _userId, 'effective_from': _dateOnly(effectiveFrom), 'calories': calories, 'protein_g': proteinG, 'carbs_g': carbsG, 'fat_g': fatG, 'fiber_g': fiberG}, onConflict: 'user_id,effective_from');
   }
 
   Future<void> addFood({
@@ -103,23 +72,22 @@ class NutritionRepository {
     required double fatG,
     required String servingSize,
   }) async {
-    await _client.from('nutrition_logs').insert({
-      'user_id': _userId,
-      'consumed_at': consumedAt.toUtc().toIso8601String(),
-      'meal_type': mealType,
-      'food_name': foodName.trim(),
-      'calories': calories,
-      'protein_g': proteinG,
-      'carbs_g': carbsG,
-      'fat_g': fatG,
-      'serving_size': servingSize.trim(),
-    });
+    if (foodName.trim().isEmpty) throw ArgumentError('Food name is required.');
+    if (servingSize.trim().isEmpty) throw ArgumentError('Serving size is required.');
+    if (calories < 0 || calories > 10000) throw ArgumentError.value(calories, 'calories', 'must be between 0 and 10000');
+    _validateMacro(proteinG, 'proteinG');
+    _validateMacro(carbsG, 'carbsG');
+    _validateMacro(fatG, 'fatG');
+    await _client.from('nutrition_logs').insert({'user_id': _userId, 'consumed_at': consumedAt.toUtc().toIso8601String(), 'meal_type': mealType.trim(), 'food_name': foodName.trim(), 'calories': calories, 'protein_g': proteinG, 'carbs_g': carbsG, 'fat_g': fatG, 'serving_size': servingSize.trim()});
   }
 
   Future<void> deleteFood(String id) async {
     await _client.from('nutrition_logs').delete().eq('id', id).eq('user_id', _userId);
   }
 
-  static String _dateOnly(DateTime date) =>
-      '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  static void _validateMacro(double value, String name) {
+    if (!value.isFinite || value < 0 || value > 1000) throw ArgumentError.value(value, name, 'must be between 0 and 1000');
+  }
+
+  static String _dateOnly(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }
