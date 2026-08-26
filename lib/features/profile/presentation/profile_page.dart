@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/profile_repository.dart';
 
-final profilePageProvider = FutureProvider<Map<String, dynamic>?>((ref) => ref.read(profileRepositoryProvider).getCurrentProfile());
+final profilePageRepositoryProvider = Provider<ProfileRepository>((ref) => ProfileRepository(Supabase.instance.client));
+final profilePageProvider = FutureProvider<Map<String, dynamic>?>((ref) => ref.read(profilePageRepositoryProvider).getCurrentProfile());
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -33,7 +35,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _load() async {
     try {
-      final profile = await ref.read(profileRepositoryProvider).getCurrentProfile();
+      final profile = await ref.read(profilePageRepositoryProvider).getCurrentProfile();
       if (profile != null && mounted) {
         _name.text = '${profile['display_name'] ?? ''}';
         _height.text = '${profile['height_cm'] ?? ''}';
@@ -55,12 +57,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      firstDate: DateTime(1940),
-      lastDate: DateTime.now(),
-      initialDate: _dob ?? DateTime(2000),
-    );
+    final picked = await showDatePicker(context: context, firstDate: DateTime(1940), lastDate: DateTime.now(), initialDate: _dob ?? DateTime(2000));
     if (picked != null) setState(() => _dob = picked);
   }
 
@@ -68,7 +65,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
-      await ref.read(profileRepositoryProvider).upsertProfile(
+      await ref.read(profilePageRepositoryProvider).upsertProfile(
         displayName: _name.text,
         dateOfBirth: _dob,
         sex: _sex,
