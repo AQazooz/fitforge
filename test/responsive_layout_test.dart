@@ -34,7 +34,7 @@ void main() {
         MaterialApp(
           theme: FitForgeTheme.dark,
           home: const MediaQuery(
-            data: const MediaQueryData(size: Size(390, 800)),
+            data: MediaQueryData(size: Size(390, 800)),
             child: DemoPreviewPage(),
           ),
         ),
@@ -47,7 +47,7 @@ void main() {
         MaterialApp(
           theme: FitForgeTheme.dark,
           home: const MediaQuery(
-            data: const MediaQueryData(size: Size(1200, 800)),
+            data: MediaQueryData(size: Size(1200, 800)),
             child: DemoPreviewPage(),
           ),
         ),
