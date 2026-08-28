@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'fitforge_theme.dart';
 import 'router.dart';
 
 class FitForgeApp extends ConsumerWidget {
@@ -14,11 +15,7 @@ class FitForgeApp extends ConsumerWidget {
       title: 'FitForge',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        colorSchemeSeed: Colors.green,
-      ),
+      theme: FitForgeTheme.dark,
     );
   }
 }

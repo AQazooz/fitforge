@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../app/responsive.dart';
 import '../data/progress_repository.dart';
 
 class ProgressPage extends StatefulWidget {
@@ -35,7 +36,7 @@ class _ProgressPageState extends State<ProgressPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Progress')),
+      appBar: AppBar(title: const Text('Progress & insights')),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _historyFuture,
         builder: (context, snapshot) {
@@ -58,90 +59,103 @@ class _ProgressPageState extends State<ProgressPage> {
           if (history.isEmpty) {
             return RefreshIndicator(
               onRefresh: () async => _refresh(),
-              child: ListView(
-                children: const [
-                  SizedBox(height: 180),
-                  Icon(Icons.insights_outlined, size: 64),
-                  SizedBox(height: 16),
-                  Center(
-                    child: Text('Complete your first workout to see progress.'),
-                  ),
-                ],
+              child: FitForgePage(
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: const [
+                    SizedBox(height: 140),
+                    Icon(Icons.insights_outlined, size: 64),
+                    SizedBox(height: 16),
+                    Center(
+                      child: Text(
+                        'Complete your first workout to see progress.',
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           }
 
           return RefreshIndicator(
             onRefresh: () async => _refresh(),
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _StatCard(
-                        label: 'Sessions',
-                        value: '${summary.completedSessions}',
+            child: FitForgePage(
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  const FitForgeSectionTitle(
+                    title: 'Your progress',
+                    subtitle: 'A clear view of the work you have put in.',
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _StatCard(
+                          label: 'Sessions',
+                          value: '${summary.completedSessions}',
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _StatCard(
-                        label: 'Sets',
-                        value: '${summary.totalSets}',
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _StatCard(
+                          label: 'Sets',
+                          value: '${summary.totalSets}',
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _StatCard(
-                        label: 'Volume',
-                        value: '${summary.totalVolumeKg.toStringAsFixed(0)} kg',
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _StatCard(
+                          label: 'Volume',
+                          value:
+                              '${summary.totalVolumeKg.toStringAsFixed(0)} kg',
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _StatCard(
-                        label: 'Best est. 1RM',
-                        value:
-                            '${summary.bestEstimated1RmKg.toStringAsFixed(1)} kg',
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _StatCard(
+                          label: 'Best est. 1RM',
+                          value:
+                              '${summary.bestEstimated1RmKg.toStringAsFixed(1)} kg',
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Workout history',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                ...history.map((session) {
-                  final plan = session['workout_plans'];
-                  final planName = plan is Map<String, dynamic>
-                      ? plan['name'] as String?
-                      : null;
-                  final sets = session['workout_log_sets'];
-                  final setCount = sets is List ? sets.length : 0;
-                  final completed = session['completed_at'] != null;
-                  return Card(
-                    child: ListTile(
-                      leading: Icon(
-                        completed ? Icons.check_circle : Icons.timelapse,
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Workout history',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  ...history.map((session) {
+                    final plan = session['workout_plans'];
+                    final planName = plan is Map<String, dynamic>
+                        ? plan['name'] as String?
+                        : null;
+                    final sets = session['workout_log_sets'];
+                    final setCount = sets is List ? sets.length : 0;
+                    final completed = session['completed_at'] != null;
+                    return Card(
+                      child: ListTile(
+                        leading: Icon(
+                          completed ? Icons.check_circle : Icons.timelapse,
+                        ),
+                        title: Text(planName ?? 'Workout session'),
+                        subtitle: Text(
+                          '${_formatDate(session['started_at'] as String?)} • $setCount sets',
+                        ),
+                        trailing: completed
+                            ? const Text('Done')
+                            : const Text('Open'),
                       ),
-                      title: Text(planName ?? 'Workout session'),
-                      subtitle: Text(
-                        '${_formatDate(session['started_at'] as String?)} • $setCount sets',
-                      ),
-                      trailing: completed
-                          ? const Text('Done')
-                          : const Text('Open'),
-                    ),
-                  );
-                }),
-              ],
+                    );
+                  }),
+                ],
+              ),
             ),
           );
         },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../app/responsive.dart';
 import '../data/workout_repository.dart';
 
 final workoutRepositoryProvider = Provider<WorkoutRepository>(
@@ -27,7 +28,7 @@ class WorkoutsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final plans = ref.watch(workoutPlansProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Workouts')),
+      appBar: AppBar(title: const Text('Training')),
       body: plans.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -36,30 +37,50 @@ class WorkoutsPage extends ConsumerWidget {
             child: const Text('Retry'),
           ),
         ),
-        data: (items) => ListView.builder(
-          padding: const EdgeInsets.all(20),
-          itemCount: items.length,
-          itemBuilder: (_, i) {
-            final plan = items[i];
-            return Card(
-              child: ListTile(
-                title: Text('${plan['name']}'),
-                subtitle: Text(
-                  '${plan['days_per_week'] ?? 0} days/week\n${plan['description'] ?? ''}',
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => WorkoutPlanPage(
-                      planId: plan['id'] as String,
-                      planName: plan['name'] as String,
+        data: (items) => FitForgePage(
+          child: ListView(
+            shrinkWrap: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              const FitForgeSectionTitle(
+                title: 'Your training plans',
+                subtitle: 'Build consistency with a plan that fits your week.',
+              ),
+              const SizedBox(height: 18),
+              ...items.map(
+                (plan) => Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 8,
+                    ),
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFF2C3B18),
+                      child: Icon(Icons.fitness_center_rounded),
+                    ),
+                    title: Text(
+                      '${plan['name']}',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    subtitle: Text(
+                      '${plan['days_per_week'] ?? 0} days/week • ${plan['description'] ?? ''}',
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_rounded),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => WorkoutPlanPage(
+                          planId: plan['id'] as String,
+                          planName: plan['name'] as String,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );
@@ -90,30 +111,47 @@ class WorkoutPlanPage extends ConsumerWidget {
             return const Center(child: Text('Could not load workout days.'));
           }
           final days = snapshot.data ?? const [];
-          return ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: days.length,
-            itemBuilder: (_, i) {
-              final day = days[i];
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(child: Text('${day['day_number']}')),
-                  title: Text('${day['title']}'),
-                  subtitle: Text('${day['notes'] ?? ''}'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => WorkoutDayPage(
-                        dayId: day['id'] as String,
-                        dayTitle: day['title'] as String,
-                        planId: planId,
+          return FitForgePage(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                const FitForgeSectionTitle(
+                  title: 'Plan schedule',
+                  subtitle: 'Choose a session to see the exercises.',
+                ),
+                const SizedBox(height: 18),
+                ...days.map(
+                  (day) => Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 8,
+                      ),
+                      leading: CircleAvatar(
+                        child: Text('${day['day_number']}'),
+                      ),
+                      title: Text(
+                        '${day['title']}',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      subtitle: Text('${day['notes'] ?? ''}'),
+                      trailing: const Icon(Icons.arrow_forward_rounded),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => WorkoutDayPage(
+                            dayId: day['id'] as String,
+                            dayTitle: day['title'] as String,
+                            planId: planId,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              );
-            },
+              ],
+            ),
           );
         },
       ),

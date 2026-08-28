@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../app/responsive.dart';
 import '../data/biometrics_repository.dart';
 
 class BiometricsPage extends StatefulWidget {
@@ -78,44 +79,56 @@ class _BiometricsPageState extends State<BiometricsPage> {
           if (rows.isEmpty) {
             return RefreshIndicator(
               onRefresh: () async => _refresh(),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: const [
-                  SizedBox(height: 180),
-                  Icon(Icons.monitor_weight_outlined, size: 64),
-                  SizedBox(height: 16),
-                  Center(child: Text('Add your first body measurement.')),
-                ],
+              child: FitForgePage(
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: const [
+                    SizedBox(height: 140),
+                    Icon(Icons.monitor_weight_outlined, size: 64),
+                    SizedBox(height: 16),
+                    Center(child: Text('Add your first body measurement.')),
+                  ],
+                ),
               ),
             );
           }
 
           return RefreshIndicator(
             onRefresh: () async => _refresh(),
-            child: ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-              itemCount: rows.length,
-              itemBuilder: (context, index) {
-                final row = rows[index];
-                final date = DateTime.tryParse(
-                  '${row['measured_at']}',
-                )?.toLocal();
-                final title = date == null
-                    ? 'Measurement'
-                    : '${date.day}/${date.month}/${date.year}';
-                return Card(
-                  child: ListTile(
-                    title: Text(title),
-                    subtitle: Text(
-                      'Weight ${_value(row['weight_kg'], ' kg')} • '
-                      'Fat ${_value(row['body_fat_pct'], '%')} • '
-                      'Muscle ${_value(row['muscle_mass_kg'], ' kg')}',
+            child: FitForgePage(
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: rows.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return const Padding(
+                      padding: EdgeInsets.only(bottom: 18),
+                      child: FitForgeSectionTitle(
+                        title: 'Body metrics',
+                        subtitle: 'Track the changes that matter to you.',
+                      ),
+                    );
+                  }
+                  final row = rows[index - 1];
+                  final date = DateTime.tryParse(
+                    '${row['measured_at']}',
+                  )?.toLocal();
+                  final title = date == null
+                      ? 'Measurement'
+                      : '${date.day}/${date.month}/${date.year}';
+                  return Card(
+                    child: ListTile(
+                      title: Text(title),
+                      subtitle: Text(
+                        'Weight ${_value(row['weight_kg'], ' kg')} • '
+                        'Fat ${_value(row['body_fat_pct'], '%')} • '
+                        'Muscle ${_value(row['muscle_mass_kg'], ' kg')}',
+                      ),
+                      trailing: Text(_value(row['waist_cm'], ' cm')),
                     ),
-                    trailing: Text(_value(row['waist_cm'], ' cm')),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           );
         },

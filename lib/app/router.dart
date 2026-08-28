@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/config/supabase_config.dart';
+import '../core/config/env.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/register_page.dart';
 import '../features/biometrics/presentation/biometrics_page.dart';
@@ -17,6 +18,7 @@ import '../features/profile/data/profile_repository.dart';
 import '../features/profile/presentation/profile_setup_page.dart';
 import '../features/workouts/presentation/progress_page.dart';
 import '../features/workouts/presentation/workouts_page.dart';
+import '../features/demo/presentation/demo_preview_page.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>(
   (ref) => ProfileRepository(SupabaseConfig.client!),
@@ -31,6 +33,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final client = SupabaseConfig.client;
       final isAuthenticated = client?.auth.currentSession != null;
       final location = state.matchedLocation;
+      if (location == '/demo') return AppEnv.demoMode ? null : '/login';
       final isAuthRoute = location == '/login' || location == '/register';
       final isProfileRoute = location == '/profile-setup';
       final isProtectedRoute = {
@@ -41,6 +44,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         '/nutrition-coach',
         '/foods',
         '/biometrics',
+        '/profile',
       }.contains(location);
 
       if (!isAuthenticated) return isAuthRoute ? null : '/login';
@@ -66,10 +70,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
+      if (AppEnv.demoMode)
+        GoRoute(path: '/demo', builder: (_, _) => const DemoPreviewPage()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),
       GoRoute(
         path: '/profile-setup',
         builder: (_, _) => const ProfileSetupPage(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (_, _) => const ProfileSetupPage(editing: true),
       ),
       GoRoute(path: '/home', builder: (_, _) => const HomePage()),
       GoRoute(path: '/workouts', builder: (_, _) => const WorkoutsPage()),
