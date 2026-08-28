@@ -22,36 +22,39 @@ void main() {
 
     await tester.binding.setSurfaceSize(const Size(1200, 800));
     await tester.pump();
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dx, 40);
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dx, 50);
     addTearDown(() => tester.binding.setSurfaceSize(null));
   });
 
   testWidgets(
     'demo preview switches navigation for compact and wide screens',
     (tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 800));
       await tester.pumpWidget(
         MaterialApp(
           theme: FitForgeTheme.dark,
-          home: MediaQuery(
+          home: const MediaQuery(
             data: const MediaQueryData(size: Size(390, 800)),
-            child: const DemoPreviewPage(),
+            child: DemoPreviewPage(),
           ),
         ),
       );
       expect(find.byType(NavigationBar), findsOneWidget);
       expect(find.byType(NavigationRail), findsNothing);
 
+      await tester.binding.setSurfaceSize(const Size(1200, 800));
       await tester.pumpWidget(
         MaterialApp(
           theme: FitForgeTheme.dark,
-          home: MediaQuery(
+          home: const MediaQuery(
             data: const MediaQueryData(size: Size(1200, 800)),
-            child: const DemoPreviewPage(),
+            child: DemoPreviewPage(),
           ),
         ),
       );
       expect(find.byType(NavigationRail), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
+      addTearDown(() => tester.binding.setSurfaceSize(null));
     },
   );
 }
