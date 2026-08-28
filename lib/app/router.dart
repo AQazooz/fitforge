@@ -41,6 +41,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         '/nutrition-coach',
         '/foods',
         '/biometrics',
+        '/profile',
       }.contains(location);
 
       if (!isAuthenticated) return isAuthRoute ? null : '/login';
@@ -70,6 +71,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile-setup',
         builder: (_, _) => const ProfileSetupPage(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (_, _) => const ProfileSetupPage(editing: true),
       ),
       GoRoute(path: '/home', builder: (_, _) => const HomePage()),
       GoRoute(path: '/workouts', builder: (_, _) => const WorkoutsPage()),

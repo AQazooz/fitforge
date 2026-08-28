@@ -42,6 +42,7 @@ class HomePage extends ConsumerWidget {
               }
             },
             itemBuilder: (_) => const [
+              PopupMenuItem(value: '/profile', child: Text('Edit profile')),
               PopupMenuItem(value: '/biometrics', child: Text('Body metrics')),
               PopupMenuItem(value: '/foods', child: Text('Food database')),
               PopupMenuDivider(),

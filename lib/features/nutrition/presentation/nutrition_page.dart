@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../app/responsive.dart';
 import '../data/nutrition_repository.dart';
 
 class NutritionPage extends StatefulWidget {
@@ -136,67 +137,73 @@ class _NutritionPageState extends State<NutritionPage> {
           final day = snapshot.data!;
           return RefreshIndicator(
             onRefresh: () async => _refresh(),
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-              children: [
-                _DaySelector(
-                  day: _selectedDay,
-                  onPrevious: () => _changeDay(-1),
-                  onNext: () => _changeDay(1),
-                ),
-                const SizedBox(height: 16),
-                _SummaryCard(day: day),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Today\'s food',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('${day.logs.length} entries'),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                if (day.logs.isEmpty)
-                  const Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text('No food logged for this day yet.'),
-                    ),
-                  )
-                else
-                  ...day.logs.map((food) {
-                    final meal = (food['meal_type'] as String?) ?? 'Meal';
-                    final calories = (food['calories'] as num?)?.toInt() ?? 0;
-                    final protein =
-                        (food['protein_g'] as num?)?.toDouble() ?? 0;
-                    return Card(
-                      child: ListTile(
-                        title: Text('${food['food_name']}'),
-                        subtitle: Text(
-                          '$meal • ${food['serving_size'] ?? ''} • ${protein.toStringAsFixed(0)}g protein',
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('$calories kcal'),
-                            IconButton(
-                              tooltip: 'Delete',
-                              onPressed: () =>
-                                  _deleteFood(food['id'] as String),
-                              icon: const Icon(Icons.delete_outline),
-                            ),
-                          ],
+            child: FitForgePage(
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  const FitForgeSectionTitle(
+                    title: 'Fuel your training',
+                    subtitle: 'Track what supports your performance.',
+                  ),
+                  const SizedBox(height: 18),
+                  _DaySelector(
+                    day: _selectedDay,
+                    onPrevious: () => _changeDay(-1),
+                    onNext: () => _changeDay(1),
+                  ),
+                  const SizedBox(height: 16),
+                  _SummaryCard(day: day),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Today\'s food',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    );
-                  }),
-              ],
+                      Text('${day.logs.length} entries'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (day.logs.isEmpty)
+                    const Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text('No food logged for this day yet.'),
+                      ),
+                    )
+                  else
+                    ...day.logs.map((food) {
+                      final meal = (food['meal_type'] as String?) ?? 'Meal';
+                      final calories = (food['calories'] as num?)?.toInt() ?? 0;
+                      final protein =
+                          (food['protein_g'] as num?)?.toDouble() ?? 0;
+                      return Card(
+                        child: ListTile(
+                          title: Text('${food['food_name']}'),
+                          subtitle: Text(
+                            '$meal • ${food['serving_size'] ?? ''} • ${protein.toStringAsFixed(0)}g protein',
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('$calories kcal'),
+                              IconButton(
+                                tooltip: 'Delete',
+                                onPressed: () =>
+                                    _deleteFood(food['id'] as String),
+                                icon: const Icon(Icons.delete_outline),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                ],
+              ),
             ),
           );
         },
