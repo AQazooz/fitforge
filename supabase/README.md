@@ -24,4 +24,17 @@ RLS is enabled on all application tables. Authorization is based on the authenti
 - Never put a service-role/secret key in Flutter.
 - Use the project's publishable key for the client.
 - Keep database authorization in RLS policies.
+- `workout_logs.plan_id` must refer to a plan owned by the current user; the
+  `0006_workout_log_plan_ownership.sql` policy enforces this independently of
+  the Flutter client.
 - Review Supabase advisors after schema changes.
+
+## Client configuration
+
+Provide only these compile-time values to the Flutter client:
+
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
+
+The app intentionally does not initialize Supabase when either value is
+missing. Do not use a `service_role` or secret key in either value.

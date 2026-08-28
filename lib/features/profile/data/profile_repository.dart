@@ -18,7 +18,19 @@ class ProfileRepository {
         .maybeSingle();
   }
 
-  Future<bool> hasCurrentProfile() async => (await getCurrentProfile()) != null;
+  /// A row alone is not enough to consider onboarding complete: the database
+  /// permits nullable profile fields for gradual profile edits.
+  Future<bool> hasCurrentProfile() async {
+    final profile = await getCurrentProfile();
+    if (profile == null) return false;
+
+    final displayName = profile['display_name'] as String?;
+    final heightCm = profile['height_cm'] as num?;
+    return displayName != null &&
+        displayName.trim().isNotEmpty &&
+        heightCm != null &&
+        heightCm > 0;
+  }
 
   Future<void> upsertProfile({
     required String displayName,

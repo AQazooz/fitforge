@@ -33,7 +33,11 @@ class ProgressRepository {
           'exercise_id, reps, weight_kg, rir, workout_logs!inner(user_id, completed_at), exercises(name)',
         )
         .eq('workout_logs.user_id', userId)
-        .order('created_at', ascending: false)
+        .order(
+          'started_at',
+          referencedTable: 'workout_logs',
+          ascending: false,
+        )
         .limit(limit * 20);
 
     return List<Map<String, dynamic>>.from(data);
