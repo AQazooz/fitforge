@@ -302,36 +302,36 @@ class _Metrics extends StatelessWidget {
 class _Actions extends StatelessWidget {
   const _Actions();
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const _Heading(
+      _Heading(
         title: 'Quick access',
         subtitle: 'Everything you need today',
       ),
-      const SizedBox(height: 14),
-      const _Action(
+      SizedBox(height: 14),
+      _Action(
         icon: Icons.fitness_center_rounded,
         title: 'Training plan',
         subtitle: 'Open today’s session',
         route: '/workouts',
       ),
-      const SizedBox(height: 10),
-      const _Action(
+      SizedBox(height: 10),
+      _Action(
         icon: Icons.restaurant_rounded,
         title: 'Nutrition',
         subtitle: 'Track calories and macros',
         route: '/nutrition',
       ),
-      const SizedBox(height: 10),
-      const _Action(
+      SizedBox(height: 10),
+      _Action(
         icon: Icons.auto_awesome_rounded,
         title: 'Smart coach',
         subtitle: 'Generate your daily targets',
         route: '/nutrition-coach',
       ),
-      const SizedBox(height: 10),
-      const _Action(
+      SizedBox(height: 10),
+      _Action(
         icon: Icons.insights_rounded,
         title: 'Progress',
         subtitle: 'Review performance',
