@@ -29,15 +29,14 @@ class DashboardRepository {
 
     final biometrics = await _client
         .from('athlete_biometrics')
-        .select('measured_at, weight_kg, body_fat_pct, muscle_mass_kg, bmi, waist_cm')
+        .select(
+          'measured_at, weight_kg, body_fat_pct, muscle_mass_kg, bmi, waist_cm',
+        )
         .eq('user_id', userId)
         .order('measured_at', ascending: false)
         .limit(1)
         .maybeSingle();
 
-    return DashboardSnapshot(
-      profile: profile,
-      latestBiometrics: biometrics,
-    );
+    return DashboardSnapshot(profile: profile, latestBiometrics: biometrics);
   }
 }

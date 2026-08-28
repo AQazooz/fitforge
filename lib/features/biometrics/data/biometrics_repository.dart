@@ -14,7 +14,9 @@ class BiometricsRepository {
   Future<List<Map<String, dynamic>>> getHistory({int limit = 30}) async {
     final data = await _client
         .from('athlete_biometrics')
-        .select('id, measured_at, weight_kg, body_fat_pct, muscle_mass_kg, bmi, waist_cm, notes')
+        .select(
+          'id, measured_at, weight_kg, body_fat_pct, muscle_mass_kg, bmi, waist_cm, notes',
+        )
         .eq('user_id', _userId)
         .order('measured_at', ascending: false)
         .limit(limit);
@@ -35,7 +37,9 @@ class BiometricsRepository {
         .eq('id', _userId)
         .single();
     final heightCm = (profile['height_cm'] as num?)?.toDouble();
-    final bmi = heightCm == null || heightCm <= 0 ? null : weightKg / ((heightCm / 100) * (heightCm / 100));
+    final bmi = heightCm == null || heightCm <= 0
+        ? null
+        : weightKg / ((heightCm / 100) * (heightCm / 100));
 
     await _client.from('athlete_biometrics').insert({
       'user_id': _userId,

@@ -48,7 +48,8 @@ class NutritionIntelligence {
       method = 'Mifflin-St Jeor estimate using profile data.';
     } else {
       bmr = 22 * weight;
-      method = 'Fallback estimate; add sex and date of birth for personalization.';
+      method =
+          'Fallback estimate; add sex and date of birth for personalization.';
     }
 
     final activity = switch (level) {
@@ -88,11 +89,13 @@ class NutritionIntelligence {
     return double.tryParse('$value');
   }
 
-  static DateTime? _date(dynamic value) => value == null ? null : DateTime.tryParse('$value');
+  static DateTime? _date(dynamic value) =>
+      value == null ? null : DateTime.tryParse('$value');
 
   static int _ageAt(DateTime birthDate, DateTime today) {
     var age = today.year - birthDate.year;
-    final birthdayPassed = today.month > birthDate.month ||
+    final birthdayPassed =
+        today.month > birthDate.month ||
         (today.month == birthDate.month && today.day >= birthDate.day);
     if (!birthdayPassed) age--;
     return age;

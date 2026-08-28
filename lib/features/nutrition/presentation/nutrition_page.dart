@@ -94,7 +94,9 @@ class _NutritionPageState extends State<NutritionPage> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -103,7 +105,11 @@ class _NutritionPageState extends State<NutritionPage> {
       appBar: AppBar(
         title: const Text('Nutrition'),
         actions: [
-          IconButton(onPressed: _editTarget, icon: const Icon(Icons.tune), tooltip: 'Set targets'),
+          IconButton(
+            onPressed: _editTarget,
+            icon: const Icon(Icons.tune),
+            tooltip: 'Set targets',
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -145,7 +151,13 @@ class _NutritionPageState extends State<NutritionPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Today\'s food', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Today\'s food',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     Text('${day.logs.length} entries'),
                   ],
                 ),
@@ -161,18 +173,22 @@ class _NutritionPageState extends State<NutritionPage> {
                   ...day.logs.map((food) {
                     final meal = (food['meal_type'] as String?) ?? 'Meal';
                     final calories = (food['calories'] as num?)?.toInt() ?? 0;
-                    final protein = (food['protein_g'] as num?)?.toDouble() ?? 0;
+                    final protein =
+                        (food['protein_g'] as num?)?.toDouble() ?? 0;
                     return Card(
                       child: ListTile(
                         title: Text('${food['food_name']}'),
-                        subtitle: Text('$meal • ${food['serving_size'] ?? ''} • ${protein.toStringAsFixed(0)}g protein'),
+                        subtitle: Text(
+                          '$meal • ${food['serving_size'] ?? ''} • ${protein.toStringAsFixed(0)}g protein',
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('$calories kcal'),
                             IconButton(
                               tooltip: 'Delete',
-                              onPressed: () => _deleteFood(food['id'] as String),
+                              onPressed: () =>
+                                  _deleteFood(food['id'] as String),
                               icon: const Icon(Icons.delete_outline),
                             ),
                           ],
@@ -190,7 +206,11 @@ class _NutritionPageState extends State<NutritionPage> {
 }
 
 class _DaySelector extends StatelessWidget {
-  const _DaySelector({required this.day, required this.onPrevious, required this.onNext});
+  const _DaySelector({
+    required this.day,
+    required this.onPrevious,
+    required this.onNext,
+  });
   final DateTime day;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
@@ -203,7 +223,12 @@ class _DaySelector extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(onPressed: onPrevious, icon: const Icon(Icons.chevron_left)),
-        Text(label, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
         IconButton(onPressed: onNext, icon: const Icon(Icons.chevron_right)),
       ],
     );
@@ -225,20 +250,46 @@ class _SummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Daily summary', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Daily summary',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
                 Text('${day.calories} kcal'),
               ],
             ),
             const SizedBox(height: 16),
-            _MacroProgress(label: 'Calories', consumed: day.calories.toDouble(), target: day.targetCalories?.toDouble(), unit: 'kcal'),
-            _MacroProgress(label: 'Protein', consumed: day.protein, target: day.targetProtein?.toDouble(), unit: 'g'),
-            _MacroProgress(label: 'Carbs', consumed: day.carbs, target: day.targetCarbs?.toDouble(), unit: 'g'),
-            _MacroProgress(label: 'Fat', consumed: day.fat, target: day.targetFat?.toDouble(), unit: 'g'),
+            _MacroProgress(
+              label: 'Calories',
+              consumed: day.calories.toDouble(),
+              target: day.targetCalories?.toDouble(),
+              unit: 'kcal',
+            ),
+            _MacroProgress(
+              label: 'Protein',
+              consumed: day.protein,
+              target: day.targetProtein?.toDouble(),
+              unit: 'g',
+            ),
+            _MacroProgress(
+              label: 'Carbs',
+              consumed: day.carbs,
+              target: day.targetCarbs?.toDouble(),
+              unit: 'g',
+            ),
+            _MacroProgress(
+              label: 'Fat',
+              consumed: day.fat,
+              target: day.targetFat?.toDouble(),
+              unit: 'g',
+            ),
             if (day.target == null)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: TextButton.icon(
-                  onPressed: () => showDialog<void>(context: context, builder: (_) => const _TargetDialog()),
+                  onPressed: () => showDialog<void>(
+                    context: context,
+                    builder: (_) => const _TargetDialog(),
+                  ),
                   icon: const Icon(Icons.flag_outlined),
                   label: const Text('Set your daily targets'),
                 ),
@@ -251,7 +302,12 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _MacroProgress extends StatelessWidget {
-  const _MacroProgress({required this.label, required this.consumed, required this.target, required this.unit});
+  const _MacroProgress({
+    required this.label,
+    required this.consumed,
+    required this.target,
+    required this.unit,
+  });
   final String label;
   final double consumed;
   final double? target;
@@ -259,14 +315,24 @@ class _MacroProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ratio = target == null || target! <= 0 ? 0.0 : (consumed / target!).clamp(0.0, 1.0);
-    final targetText = target == null ? 'No target' : '${target!.toStringAsFixed(0)} $unit';
+    final ratio = target == null || target! <= 0
+        ? 0.0
+        : (consumed / target!).clamp(0.0, 1.0);
+    final targetText = target == null
+        ? 'No target'
+        : '${target!.toStringAsFixed(0)} $unit';
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(label), Text('${consumed.toStringAsFixed(0)} / $targetText')]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label),
+              Text('${consumed.toStringAsFixed(0)} / $targetText'),
+            ],
+          ),
           const SizedBox(height: 6),
           LinearProgressIndicator(value: target == null ? null : ratio),
         ],
@@ -276,7 +342,16 @@ class _MacroProgress extends StatelessWidget {
 }
 
 class _FoodFormResult {
-  const _FoodFormResult({required this.foodName, required this.mealType, required this.calories, required this.protein, required this.carbs, required this.fat, required this.servingSize, required this.time});
+  const _FoodFormResult({
+    required this.foodName,
+    required this.mealType,
+    required this.calories,
+    required this.protein,
+    required this.carbs,
+    required this.fat,
+    required this.servingSize,
+    required this.time,
+  });
   final String foodName;
   final String mealType;
   final int calories;
@@ -305,7 +380,14 @@ class _FoodDialogState extends State<_FoodDialog> {
 
   @override
   void dispose() {
-    for (final controller in [_name, _calories, _protein, _carbs, _fat, _serving]) {
+    for (final controller in [
+      _name,
+      _calories,
+      _protein,
+      _carbs,
+      _fat,
+      _serving,
+    ]) {
       controller.dispose();
     }
     super.dispose();
@@ -321,24 +403,63 @@ class _FoodDialogState extends State<_FoodDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(controller: _name, decoration: const InputDecoration(labelText: 'Food name'), validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null),
+              TextFormField(
+                controller: _name,
+                decoration: const InputDecoration(labelText: 'Food name'),
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Required' : null,
+              ),
               DropdownButtonFormField<String>(
                 initialValue: _mealType,
                 decoration: const InputDecoration(labelText: 'Meal type'),
-                items: const ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Meal'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                items: const ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Meal']
+                    .map((v) => DropdownMenuItem(value: v, child: Text(v)))
+                    .toList(),
                 onChanged: (v) => setState(() => _mealType = v!),
               ),
-              TextFormField(controller: _serving, decoration: const InputDecoration(labelText: 'Serving size')),
-              TextFormField(controller: _calories, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Calories'), validator: _numberValidator),
-              TextFormField(controller: _protein, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Protein (g)'), validator: _doubleValidator),
-              TextFormField(controller: _carbs, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Carbs (g)'), validator: _doubleValidator),
-              TextFormField(controller: _fat, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Fat (g)'), validator: _doubleValidator),
+              TextFormField(
+                controller: _serving,
+                decoration: const InputDecoration(labelText: 'Serving size'),
+              ),
+              TextFormField(
+                controller: _calories,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Calories'),
+                validator: _numberValidator,
+              ),
+              TextFormField(
+                controller: _protein,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Protein (g)'),
+                validator: _doubleValidator,
+              ),
+              TextFormField(
+                controller: _carbs,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Carbs (g)'),
+                validator: _doubleValidator,
+              ),
+              TextFormField(
+                controller: _fat,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Fat (g)'),
+                validator: _doubleValidator,
+              ),
             ],
           ),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         FilledButton(
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;
@@ -374,7 +495,13 @@ class _FoodDialogState extends State<_FoodDialog> {
 }
 
 class _TargetFormResult {
-  const _TargetFormResult({required this.calories, required this.protein, required this.carbs, required this.fat, required this.fiber});
+  const _TargetFormResult({
+    required this.calories,
+    required this.protein,
+    required this.carbs,
+    required this.fat,
+    required this.fiber,
+  });
   final int calories;
   final double protein;
   final double carbs;
@@ -419,17 +546,54 @@ class _TargetDialogState extends State<_TargetDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(controller: _calories, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Calories'), validator: (v) => int.tryParse(v ?? '') == null ? 'Enter calories' : null),
-              TextFormField(controller: _protein, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Protein (g)'), validator: _validate),
-              TextFormField(controller: _carbs, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Carbs (g)'), validator: _validate),
-              TextFormField(controller: _fat, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Fat (g)'), validator: _validate),
-              TextFormField(controller: _fiber, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Fiber (g)'), validator: _validate),
+              TextFormField(
+                controller: _calories,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Calories'),
+                validator: (v) =>
+                    int.tryParse(v ?? '') == null ? 'Enter calories' : null,
+              ),
+              TextFormField(
+                controller: _protein,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Protein (g)'),
+                validator: _validate,
+              ),
+              TextFormField(
+                controller: _carbs,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Carbs (g)'),
+                validator: _validate,
+              ),
+              TextFormField(
+                controller: _fat,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Fat (g)'),
+                validator: _validate,
+              ),
+              TextFormField(
+                controller: _fiber,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Fiber (g)'),
+                validator: _validate,
+              ),
             ],
           ),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         FilledButton(
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;

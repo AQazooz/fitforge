@@ -45,7 +45,8 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
       final factor = servings;
       await _nutrition.addFood(
         consumedAt: DateTime.now(),
-        foodName: '${food['name']} (${servings.toStringAsFixed(servings.truncateToDouble() == servings ? 0 : 1)} serving)',
+        foodName:
+            '${food['name']} (${servings.toStringAsFixed(servings.truncateToDouble() == servings ? 0 : 1)} serving)',
         mealType: 'Meal',
         calories: ((food['calories'] as num).toDouble() * factor).round(),
         proteinG: (food['protein_g'] as num).toDouble() * factor,
@@ -54,15 +55,15 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
         servingSize: '${food['serving_size']} × ${servings.toStringAsFixed(1)}',
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Food added to today.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Food added to today.')));
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not add food: $error')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not add food: $error')));
       }
     }
   }
@@ -167,7 +168,10 @@ class _ServingDialogState extends State<_ServingDialog> {
         decoration: const InputDecoration(labelText: 'Servings'),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         FilledButton(
           onPressed: () {
             final value = double.tryParse(_controller.text);

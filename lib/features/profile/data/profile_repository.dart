@@ -11,13 +11,14 @@ class ProfileRepository {
 
     return _client
         .from('users_profiles')
-        .select('id, display_name, avatar_url, date_of_birth, sex, height_cm, unit_system, training_level, goal')
+        .select(
+          'id, display_name, avatar_url, date_of_birth, sex, height_cm, unit_system, training_level, goal',
+        )
         .eq('id', userId)
         .maybeSingle();
   }
 
-  Future<bool> hasCurrentProfile() async =>
-      (await getCurrentProfile()) != null;
+  Future<bool> hasCurrentProfile() async => (await getCurrentProfile()) != null;
 
   Future<void> upsertProfile({
     required String displayName,

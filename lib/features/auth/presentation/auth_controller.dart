@@ -30,10 +30,7 @@ class AuthController {
 
   AuthRepository? get _repository => _ref.read(authRepositoryProvider);
 
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     final repository = _repository;
     if (repository == null) {
       throw StateError('Supabase is not configured.');
@@ -41,10 +38,7 @@ class AuthController {
     await repository.signIn(email: email, password: password);
   }
 
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signUp({required String email, required String password}) async {
     final repository = _repository;
     if (repository == null) {
       throw StateError('Supabase is not configured.');

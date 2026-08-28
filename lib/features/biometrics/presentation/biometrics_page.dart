@@ -98,8 +98,12 @@ class _BiometricsPageState extends State<BiometricsPage> {
               itemCount: rows.length,
               itemBuilder: (context, index) {
                 final row = rows[index];
-                final date = DateTime.tryParse('${row['measured_at']}')?.toLocal();
-                final title = date == null ? 'Measurement' : '${date.day}/${date.month}/${date.year}';
+                final date = DateTime.tryParse(
+                  '${row['measured_at']}',
+                )?.toLocal();
+                final title = date == null
+                    ? 'Measurement'
+                    : '${date.day}/${date.month}/${date.year}';
                 return Card(
                   child: ListTile(
                     title: Text(title),
@@ -169,7 +173,8 @@ class _MetricDialogState extends State<_MetricDialog> {
   }
 
   String? _positive(String? value, {bool required = false}) {
-    if (value == null || value.trim().isEmpty) return required ? 'Required' : null;
+    if (value == null || value.trim().isEmpty)
+      return required ? 'Required' : null;
     final number = double.tryParse(value);
     return number == null || number <= 0 ? 'Enter a valid value' : null;
   }
@@ -203,25 +208,35 @@ class _MetricDialogState extends State<_MetricDialog> {
               ),
               TextFormField(
                 controller: _weight,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Weight (kg)'),
                 validator: (value) => _positive(value, required: true),
               ),
               TextFormField(
                 controller: _bodyFat,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Body fat (%)'),
                 validator: _positive,
               ),
               TextFormField(
                 controller: _muscle,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Muscle mass (kg)'),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Muscle mass (kg)',
+                ),
                 validator: _positive,
               ),
               TextFormField(
                 controller: _waist,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Waist (cm)'),
                 validator: _positive,
               ),
@@ -235,7 +250,10 @@ class _MetricDialogState extends State<_MetricDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         FilledButton(
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;

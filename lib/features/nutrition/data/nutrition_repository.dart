@@ -6,10 +6,22 @@ class NutritionDay {
   final Map<String, dynamic>? target;
   final List<Map<String, dynamic>> logs;
 
-  int get calories => logs.fold<int>(0, (sum, row) => sum + ((row['calories'] as num?)?.toInt() ?? 0));
-  double get protein => logs.fold<double>(0, (sum, row) => sum + ((row['protein_g'] as num?)?.toDouble() ?? 0));
-  double get carbs => logs.fold<double>(0, (sum, row) => sum + ((row['carbs_g'] as num?)?.toDouble() ?? 0));
-  double get fat => logs.fold<double>(0, (sum, row) => sum + ((row['fat_g'] as num?)?.toDouble() ?? 0));
+  int get calories => logs.fold<int>(
+    0,
+    (sum, row) => sum + ((row['calories'] as num?)?.toInt() ?? 0),
+  );
+  double get protein => logs.fold<double>(
+    0,
+    (sum, row) => sum + ((row['protein_g'] as num?)?.toDouble() ?? 0),
+  );
+  double get carbs => logs.fold<double>(
+    0,
+    (sum, row) => sum + ((row['carbs_g'] as num?)?.toDouble() ?? 0),
+  );
+  double get fat => logs.fold<double>(
+    0,
+    (sum, row) => sum + ((row['fat_g'] as num?)?.toDouble() ?? 0),
+  );
 
   num? get targetCalories => target?['calories'] as num?;
   num? get targetProtein => target?['protein_g'] as num?;
@@ -35,7 +47,9 @@ class NutritionRepository {
 
     final target = await _client
         .from('nutrition_targets')
-        .select('id, effective_from, calories, protein_g, carbs_g, fat_g, fiber_g')
+        .select(
+          'id, effective_from, calories, protein_g, carbs_g, fat_g, fiber_g',
+        )
         .eq('user_id', _userId)
         .lte('effective_from', _dateOnly(start))
         .order('effective_from', ascending: false)
@@ -44,13 +58,18 @@ class NutritionRepository {
 
     final logs = await _client
         .from('nutrition_logs')
-        .select('id, consumed_at, meal_type, food_name, calories, protein_g, carbs_g, fat_g, serving_size')
+        .select(
+          'id, consumed_at, meal_type, food_name, calories, protein_g, carbs_g, fat_g, serving_size',
+        )
         .eq('user_id', _userId)
         .gte('consumed_at', start.toUtc().toIso8601String())
         .lt('consumed_at', end.toUtc().toIso8601String())
         .order('consumed_at', ascending: false);
 
-    return NutritionDay(target: target, logs: List<Map<String, dynamic>>.from(logs));
+    return NutritionDay(
+      target: target,
+      logs: List<Map<String, dynamic>>.from(logs),
+    );
   }
 
   Future<Map<String, dynamic>> loadNutritionContext() async {
@@ -68,7 +87,10 @@ class NutritionRepository {
         .limit(1)
         .maybeSingle();
 
-    return {'profile': Map<String, dynamic>.from(profile), 'biometrics': biometrics};
+    return {
+      'profile': Map<String, dynamic>.from(profile),
+      'biometrics': biometrics,
+    };
   }
 
   Future<void> saveTarget({
@@ -79,18 +101,15 @@ class NutritionRepository {
     required double fatG,
     required double fiberG,
   }) async {
-    await _client.from('nutrition_targets').upsert(
-      {
-        'user_id': _userId,
-        'effective_from': _dateOnly(effectiveFrom),
-        'calories': calories,
-        'protein_g': proteinG,
-        'carbs_g': carbsG,
-        'fat_g': fatG,
-        'fiber_g': fiberG,
-      },
-      onConflict: 'user_id,effective_from',
-    );
+    await _client.from('nutrition_targets').upsert({
+      'user_id': _userId,
+      'effective_from': _dateOnly(effectiveFrom),
+      'calories': calories,
+      'protein_g': proteinG,
+      'carbs_g': carbsG,
+      'fat_g': fatG,
+      'fiber_g': fiberG,
+    }, onConflict: 'user_id,effective_from');
   }
 
   Future<void> addFood({
@@ -117,7 +136,11 @@ class NutritionRepository {
   }
 
   Future<void> deleteFood(String id) async {
-    await _client.from('nutrition_logs').delete().eq('id', id).eq('user_id', _userId);
+    await _client
+        .from('nutrition_logs')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', _userId);
   }
 
   static String _dateOnly(DateTime date) =>

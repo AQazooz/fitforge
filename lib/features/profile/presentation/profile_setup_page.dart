@@ -5,7 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../data/profile_repository.dart';
 
-final profileRepositoryProvider = Provider<ProfileRepository?>((ref) => ProfileRepository(Supabase.instance.client));
+final profileRepositoryProvider = Provider<ProfileRepository?>(
+  (ref) => ProfileRepository(Supabase.instance.client),
+);
 
 class ProfileSetupPage extends ConsumerStatefulWidget {
   const ProfileSetupPage({super.key});
@@ -33,7 +35,12 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(context: context, firstDate: DateTime(1940), lastDate: DateTime.now(), initialDate: _dateOfBirth ?? DateTime(2000));
+    final picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(1940),
+      lastDate: DateTime.now(),
+      initialDate: _dateOfBirth ?? DateTime(2000),
+    );
     if (picked != null) setState(() => _dateOfBirth = picked);
   }
 
@@ -41,7 +48,9 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
-      await ref.read(profileRepositoryProvider)!.upsertProfile(
+      await ref
+          .read(profileRepositoryProvider)!
+          .upsertProfile(
             displayName: _nameController.text,
             dateOfBirth: _dateOfBirth,
             sex: _sex,
@@ -52,7 +61,10 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
           );
       if (mounted) context.go('/home');
     } catch (error) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not save profile: $error')));
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not save profile: $error')),
+        );
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -60,7 +72,9 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dobLabel = _dateOfBirth == null ? 'Select date of birth' : '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}';
+    final dobLabel = _dateOfBirth == null
+        ? 'Select date of birth'
+        : '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}';
     return Scaffold(
       appBar: AppBar(title: const Text('Set up your profile')),
       body: SafeArea(
@@ -69,25 +83,117 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              const Text('Tell us about you', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              const Text(
+                'Tell us about you',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 8),
-              const Text('We use these details to personalize workouts, nutrition, and progress tracking.'),
+              const Text(
+                'We use these details to personalize workouts, nutrition, and progress tracking.',
+              ),
               const SizedBox(height: 24),
-              TextFormField(controller: _nameController, decoration: const InputDecoration(labelText: 'Display name'), validator: (value) => value == null || value.trim().isEmpty ? 'Enter your name' : null),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Display name'),
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'Enter your name'
+                    : null,
+              ),
               const SizedBox(height: 16),
-              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Date of birth'), subtitle: Text(dobLabel), trailing: const Icon(Icons.calendar_today), onTap: _pickDate),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Date of birth'),
+                subtitle: Text(dobLabel),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: _pickDate,
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _heightController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Height (cm)'), validator: (value) { final height = double.tryParse(value ?? ''); return height == null || height < 100 || height > 250 ? 'Enter a valid height' : null; }),
+              TextFormField(
+                controller: _heightController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Height (cm)'),
+                validator: (value) {
+                  final height = double.tryParse(value ?? '');
+                  return height == null || height < 100 || height > 250
+                      ? 'Enter a valid height'
+                      : null;
+                },
+              ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(initialValue: _sex, decoration: const InputDecoration(labelText: 'Sex'), items: const [DropdownMenuItem(value: 'male', child: Text('Male')), DropdownMenuItem(value: 'female', child: Text('Female')), DropdownMenuItem(value: 'other', child: Text('Other'))], onChanged: (value) => setState(() => _sex = value)),
+              DropdownButtonFormField<String>(
+                initialValue: _sex,
+                decoration: const InputDecoration(labelText: 'Sex'),
+                items: const [
+                  DropdownMenuItem(value: 'male', child: Text('Male')),
+                  DropdownMenuItem(value: 'female', child: Text('Female')),
+                  DropdownMenuItem(value: 'other', child: Text('Other')),
+                ],
+                onChanged: (value) => setState(() => _sex = value),
+              ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(initialValue: _trainingLevel, decoration: const InputDecoration(labelText: 'Training level'), items: const [DropdownMenuItem(value: 'beginner', child: Text('Beginner')), DropdownMenuItem(value: 'intermediate', child: Text('Intermediate')), DropdownMenuItem(value: 'advanced', child: Text('Advanced'))], onChanged: (value) => setState(() => _trainingLevel = value!)),
+              DropdownButtonFormField<String>(
+                initialValue: _trainingLevel,
+                decoration: const InputDecoration(labelText: 'Training level'),
+                items: const [
+                  DropdownMenuItem(value: 'beginner', child: Text('Beginner')),
+                  DropdownMenuItem(
+                    value: 'intermediate',
+                    child: Text('Intermediate'),
+                  ),
+                  DropdownMenuItem(value: 'advanced', child: Text('Advanced')),
+                ],
+                onChanged: (value) => setState(() => _trainingLevel = value!),
+              ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(initialValue: _goal, decoration: const InputDecoration(labelText: 'Primary goal'), items: const [DropdownMenuItem(value: 'muscle_gain', child: Text('Build muscle')), DropdownMenuItem(value: 'fat_loss', child: Text('Lose fat')), DropdownMenuItem(value: 'maintenance', child: Text('Maintain')), DropdownMenuItem(value: 'performance', child: Text('Performance'))], onChanged: (value) => setState(() => _goal = value!)),
+              DropdownButtonFormField<String>(
+                initialValue: _goal,
+                decoration: const InputDecoration(labelText: 'Primary goal'),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'muscle_gain',
+                    child: Text('Build muscle'),
+                  ),
+                  DropdownMenuItem(value: 'fat_loss', child: Text('Lose fat')),
+                  DropdownMenuItem(
+                    value: 'maintenance',
+                    child: Text('Maintain'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'performance',
+                    child: Text('Performance'),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _goal = value!),
+              ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(initialValue: _unitSystem, decoration: const InputDecoration(labelText: 'Units'), items: const [DropdownMenuItem(value: 'metric', child: Text('Metric (kg / cm)')), DropdownMenuItem(value: 'imperial', child: Text('Imperial (lb / in)'))], onChanged: (value) => setState(() => _unitSystem = value!)),
+              DropdownButtonFormField<String>(
+                initialValue: _unitSystem,
+                decoration: const InputDecoration(labelText: 'Units'),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'metric',
+                    child: Text('Metric (kg / cm)'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'imperial',
+                    child: Text('Imperial (lb / in)'),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _unitSystem = value!),
+              ),
               const SizedBox(height: 28),
-              FilledButton(onPressed: _saving ? null : _save, child: _saving ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Continue')),
+              FilledButton(
+                onPressed: _saving ? null : _save,
+                child: _saving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Continue'),
+              ),
             ],
           ),
         ),

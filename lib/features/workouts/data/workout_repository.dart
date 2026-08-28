@@ -38,7 +38,9 @@ class WorkoutRepository {
     return List<Map<String, dynamic>>.from(
       await _client
           .from('workout_plan_exercises')
-          .select('id, exercise_id, sort_order, sets, reps_min, reps_max, rest_seconds, target_rir, notes, exercises(id, name, muscle_group, equipment)')
+          .select(
+            'id, exercise_id, sort_order, sets, reps_min, reps_max, rest_seconds, target_rir, notes, exercises(id, name, muscle_group, equipment)',
+          )
           .eq('plan_day_id', dayId)
           .order('sort_order'),
     );

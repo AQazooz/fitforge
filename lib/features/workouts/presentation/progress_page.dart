@@ -63,7 +63,9 @@ class _ProgressPageState extends State<ProgressPage> {
                   SizedBox(height: 180),
                   Icon(Icons.insights_outlined, size: 64),
                   SizedBox(height: 16),
-                  Center(child: Text('Complete your first workout to see progress.')),
+                  Center(
+                    child: Text('Complete your first workout to see progress.'),
+                  ),
                 ],
               ),
             );
@@ -76,34 +78,66 @@ class _ProgressPageState extends State<ProgressPage> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: _StatCard(label: 'Sessions', value: '${summary.completedSessions}')),
+                    Expanded(
+                      child: _StatCard(
+                        label: 'Sessions',
+                        value: '${summary.completedSessions}',
+                      ),
+                    ),
                     const SizedBox(width: 10),
-                    Expanded(child: _StatCard(label: 'Sets', value: '${summary.totalSets}')),
+                    Expanded(
+                      child: _StatCard(
+                        label: 'Sets',
+                        value: '${summary.totalSets}',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(child: _StatCard(label: 'Volume', value: '${summary.totalVolumeKg.toStringAsFixed(0)} kg')),
+                    Expanded(
+                      child: _StatCard(
+                        label: 'Volume',
+                        value: '${summary.totalVolumeKg.toStringAsFixed(0)} kg',
+                      ),
+                    ),
                     const SizedBox(width: 10),
-                    Expanded(child: _StatCard(label: 'Best est. 1RM', value: '${summary.bestEstimated1RmKg.toStringAsFixed(1)} kg')),
+                    Expanded(
+                      child: _StatCard(
+                        label: 'Best est. 1RM',
+                        value:
+                            '${summary.bestEstimated1RmKg.toStringAsFixed(1)} kg',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                const Text('Workout history', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Workout history',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 ...history.map((session) {
                   final plan = session['workout_plans'];
-                  final planName = plan is Map<String, dynamic> ? plan['name'] as String? : null;
+                  final planName = plan is Map<String, dynamic>
+                      ? plan['name'] as String?
+                      : null;
                   final sets = session['workout_log_sets'];
                   final setCount = sets is List ? sets.length : 0;
                   final completed = session['completed_at'] != null;
                   return Card(
                     child: ListTile(
-                      leading: Icon(completed ? Icons.check_circle : Icons.timelapse),
+                      leading: Icon(
+                        completed ? Icons.check_circle : Icons.timelapse,
+                      ),
                       title: Text(planName ?? 'Workout session'),
-                      subtitle: Text('${_formatDate(session['started_at'] as String?)} • $setCount sets'),
-                      trailing: completed ? const Text('Done') : const Text('Open'),
+                      subtitle: Text(
+                        '${_formatDate(session['started_at'] as String?)} • $setCount sets',
+                      ),
+                      trailing: completed
+                          ? const Text('Done')
+                          : const Text('Open'),
                     ),
                   );
                 }),
@@ -132,7 +166,12 @@ class _StatCard extends StatelessWidget {
           children: [
             Text(label, style: Theme.of(context).textTheme.labelLarge),
             const SizedBox(height: 8),
-            Text(value, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),

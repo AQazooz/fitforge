@@ -9,7 +9,9 @@ class FoodCatalogRepository {
     final clean = query.trim();
     final request = _client
         .from('food_catalog')
-        .select('id, name, category, serving_size, calories, protein_g, carbs_g, fat_g, fiber_g')
+        .select(
+          'id, name, category, serving_size, calories, protein_g, carbs_g, fat_g, fiber_g',
+        )
         .eq('is_active', true);
 
     final data = clean.isEmpty

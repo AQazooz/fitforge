@@ -5,8 +5,7 @@ class AuthRepository {
 
   final SupabaseClient _client;
 
-  Stream<AuthState> get authStateChanges =>
-      _client.auth.onAuthStateChange;
+  Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
   Session? get currentSession => _client.auth.currentSession;
 
@@ -14,19 +13,12 @@ class AuthRepository {
     required String email,
     required String password,
   }) =>
-      _client.auth.signInWithPassword(
-        email: email.trim(),
-        password: password,
-      );
+      _client.auth.signInWithPassword(email: email.trim(), password: password);
 
   Future<AuthResponse> signUp({
     required String email,
     required String password,
-  }) =>
-      _client.auth.signUp(
-        email: email.trim(),
-        password: password,
-      );
+  }) => _client.auth.signUp(email: email.trim(), password: password);
 
   Future<void> signOut() => _client.auth.signOut();
 }
