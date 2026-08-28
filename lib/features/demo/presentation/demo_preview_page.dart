@@ -168,17 +168,17 @@ class _DemoHome extends StatelessWidget {
     title: strings.arabic ? 'مستعد يا أليكس؟' : 'Ready, Alex?',
     subtitle: strings.arabic ? 'قوتك القادمة تُبنى في كل جلسة.' : 'Your future strength is built one session at a time.',
     cards: [
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.fitness_center_rounded,
         title: 'Training plan',
         value: 'Push day • 4 exercises',
       ),
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.restaurant_rounded,
         title: 'Nutrition',
         value: '1,840 / 2,400 kcal',
       ),
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.insights_rounded,
         title: 'Progress',
         value: '12 sessions this month',
@@ -196,12 +196,12 @@ class _DemoWorkouts extends StatelessWidget {
     title: strings.arabic ? 'خططك التدريبية' : 'Your training plans',
     subtitle: strings.arabic ? 'حافظ على استمراريتك بخطة تناسب أسبوعك.' : 'Stay consistent with a plan built for your week.',
     cards: [
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.bolt_rounded,
         title: 'Forge Strong',
         value: '4 days/week • Today: Push day',
       ),
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.calendar_month_rounded,
         title: 'Next session',
         value: 'Bench press • Rows • Shoulder press',
@@ -219,12 +219,12 @@ class _DemoNutrition extends StatelessWidget {
     title: strings.arabic ? 'غذِّ تدريبك' : 'Fuel your training',
     subtitle: strings.arabic ? 'تابع ما يدعم أداءك.' : 'Track what supports your performance.',
     cards: [
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.local_fire_department_rounded,
         title: 'Daily summary',
         value: '1,840 / 2,400 kcal • 128g protein',
       ),
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.restaurant_menu_rounded,
         title: 'Today’s food',
         value: 'Greek yogurt • Chicken bowl • Oats',
@@ -242,17 +242,17 @@ class _DemoProgress extends StatelessWidget {
     title: strings.arabic ? 'تقدمك' : 'Your progress',
     subtitle: strings.arabic ? 'رؤية واضحة للجهد الذي بذلته.' : 'A clear view of the work you have put in.',
     cards: [
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.check_circle_rounded,
         title: 'Sessions',
         value: '12 completed',
       ),
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.trending_up_rounded,
         title: 'Volume',
         value: '18,420 kg • +14% this month',
       ),
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.emoji_events_rounded,
         title: 'Best lift',
         value: 'Bench press • 82.5 kg',
@@ -270,13 +270,13 @@ class _DemoProfile extends StatelessWidget {
     title: 'Alex Morgan',
     subtitle: strings.arabic ? 'بناء العضلات • متوسط • الوحدات المترية' : 'Build muscle • Intermediate • Metric units',
     cards: [
-      _DemoCard(icon: Icons.height_rounded, title: 'Height', value: '178 cm'),
-      _DemoCard(
+      const _DemoCard(icon: Icons.height_rounded, title: 'Height', value: '178 cm'),
+      const _DemoCard(
         icon: Icons.monitor_weight_outlined,
         title: 'Latest weight',
         value: '76.4 kg',
       ),
-      _DemoCard(
+      const _DemoCard(
         icon: Icons.flag_rounded,
         title: 'Goal',
         value: 'Build your strongest self',
