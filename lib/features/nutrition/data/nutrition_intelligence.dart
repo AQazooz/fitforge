@@ -70,7 +70,7 @@ class NutritionIntelligence {
     final fat = (safeCalories * 0.25) / 9;
     final remaining = math.max(0, safeCalories - (protein * 4) - (fat * 9));
     final carbs = remaining / 4;
-    final fiber = math.max(20, safeCalories / 1000 * 14);
+    final fiber = math.max(20, safeCalories / 1000 * 14).toDouble();
 
     return NutritionRecommendation(
       calories: safeCalories,
