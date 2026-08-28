@@ -48,7 +48,11 @@ jobs:
           test -n "$ANDROID_KEY_PASSWORD"
 
       - name: Generate Android platform project
-        run: flutter create --platforms=android --org com.forgelabs --project-name fitforge .
+        run: |
+          flutter create --platforms=android --org com.forgelabs --project-name fitforge .
+          if ! git ls-files --error-unmatch test/widget_test.dart >/dev/null 2>&1; then
+            rm -f test/widget_test.dart
+          fi
 
       - name: Install dependencies
         run: flutter pub get
