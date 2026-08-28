@@ -29,7 +29,7 @@ class HomePage extends ConsumerWidget {
       ),
       body: snapshot.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(child: FilledButton(onPressed: () => ref.invalidate(dashboardSnapshotProvider), child: const Text('Retry'))),
+        error: (_, _) => Center(child: FilledButton(onPressed: () => ref.invalidate(dashboardSnapshotProvider), child: const Text('Retry'))),
         data: (data) => RefreshIndicator(onRefresh: () => ref.refresh(dashboardSnapshotProvider.future), child: _DashboardContent(snapshot: data)),
       ),
     );
