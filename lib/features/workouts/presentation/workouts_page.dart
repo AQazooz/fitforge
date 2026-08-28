@@ -83,10 +83,12 @@ class WorkoutPlanPage extends ConsumerWidget {
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: future,
         builder: (_, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError)
+          }
+          if (snapshot.hasError) {
             return const Center(child: Text('Could not load workout days.'));
+          }
           final days = snapshot.data ?? const [];
           return ListView.builder(
             padding: const EdgeInsets.all(20),
@@ -137,10 +139,12 @@ class WorkoutDayPage extends ConsumerWidget {
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: ref.read(workoutRepositoryProvider).getDayExercises(dayId),
         builder: (_, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError)
+          }
+          if (snapshot.hasError) {
             return const Center(child: Text('Could not load exercises.'));
+          }
           final exercises = snapshot.data ?? const [];
           return ListView(
             padding: const EdgeInsets.all(20),
@@ -262,10 +266,11 @@ class _WorkoutSessionPageState extends ConsumerState<WorkoutSessionPage> {
       await repo.completeSession(widget.sessionId);
       if (mounted) Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Could not save workout: $e')));
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }

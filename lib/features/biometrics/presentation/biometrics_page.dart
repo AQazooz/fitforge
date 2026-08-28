@@ -173,8 +173,9 @@ class _MetricDialogState extends State<_MetricDialog> {
   }
 
   String? _positive(String? value, {bool required = false}) {
-    if (value == null || value.trim().isEmpty)
+    if (value == null || value.trim().isEmpty) {
       return required ? 'Required' : null;
+    }
     final number = double.tryParse(value);
     return number == null || number <= 0 ? 'Enter a valid value' : null;
   }

@@ -46,10 +46,11 @@ class _NutritionCoachPageState extends State<NutritionCoachPage> {
       );
       Navigator.of(context).pop();
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not save target: $error')),
         );
+      }
     }
   }
 
@@ -60,8 +61,9 @@ class _NutritionCoachPageState extends State<NutritionCoachPage> {
       body: FutureBuilder<NutritionRecommendation>(
         future: _recommendation,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
           if (snapshot.hasError) {
             return Center(
               child: FilledButton(

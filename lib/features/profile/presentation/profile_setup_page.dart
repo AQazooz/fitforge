@@ -61,10 +61,11 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
           );
       if (mounted) context.go('/home');
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not save profile: $error')),
         );
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
