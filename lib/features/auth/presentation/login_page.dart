@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/fitforge_theme.dart';
+import '../../../core/config/env.dart';
 import 'auth_controller.dart';
 import 'auth_shell.dart';
 
@@ -114,6 +115,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               onPressed: _loading ? null : () => context.go('/register'),
               child: const Text('Create an account'),
             ),
+            if (AppEnv.demoMode) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: _loading ? null : () => context.go('/demo'),
+                icon: const Icon(Icons.visibility_rounded),
+                label: const Text('Demo preview'),
+              ),
+            ],
           ],
         ),
       ),
