@@ -73,6 +73,7 @@ abstract final class FitForgeTheme {
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: FitForgeColors.lime, width: 1.5),
         ),
+        errorMaxLines: 3,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -83,6 +84,10 @@ abstract final class FitForgeTheme {
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
+      focusColor: FitForgeColors.lime,
+      hoverColor: const Color(0x223B5215),
+      splashColor: const Color(0x335F8A21),
+      visualDensity: VisualDensity.standard,
       navigationBarTheme: const NavigationBarThemeData(
         backgroundColor: FitForgeColors.surface,
         indicatorColor: Color(0xFF2C3B18),

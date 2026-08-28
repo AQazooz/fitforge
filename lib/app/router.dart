@@ -98,8 +98,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/foods', builder: (_, _) => const FoodSearchPage()),
       GoRoute(path: '/biometrics', builder: (_, _) => const BiometricsPage()),
     ],
-    errorBuilder: (_, state) =>
-        Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
+    errorBuilder: (_, state) => Scaffold(
+      body: Center(
+        child: Semantics(
+          container: true,
+          liveRegion: true,
+          label: 'خطأ في التنقل',
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'تعذر العثور على هذه الصفحة\n${state.uri}',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    ),
   );
 
   ref.onDispose(() {
