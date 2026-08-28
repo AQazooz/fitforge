@@ -19,6 +19,7 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('FitForge'),
         actions: [
+          IconButton(tooltip: 'Profile', onPressed: () => context.push('/profile'), icon: const Icon(Icons.person_outline)),
           IconButton(onPressed: () => context.push('/workouts'), icon: const Icon(Icons.fitness_center)),
           IconButton(onPressed: () => context.push('/progress'), icon: const Icon(Icons.insights)),
           IconButton(onPressed: () => context.push('/nutrition'), icon: const Icon(Icons.restaurant)),
@@ -86,6 +87,8 @@ class _DashboardContent extends StatelessWidget {
         _ActionCard(icon: Icons.monitor_weight_outlined, title: 'Body metrics', subtitle: 'Log weight, body fat, muscle, and waist.', onTap: () => context.push('/biometrics')),
         const SizedBox(height: 12),
         _ActionCard(icon: Icons.insights, title: 'View progress', subtitle: 'Review workout history and performance.', onTap: () => context.push('/progress')),
+        const SizedBox(height: 12),
+        _ActionCard(icon: Icons.person_outline, title: 'Edit profile', subtitle: 'Update your personal and training preferences.', onTap: () => context.push('/profile')),
       ],
     );
   }

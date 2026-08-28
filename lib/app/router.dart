@@ -14,6 +14,7 @@ import '../features/nutrition/presentation/food_search_page.dart';
 import '../features/nutrition/presentation/nutrition_coach_page.dart';
 import '../features/nutrition/presentation/nutrition_page.dart';
 import '../features/profile/data/profile_repository.dart';
+import '../features/profile/presentation/profile_page.dart';
 import '../features/profile/presentation/profile_setup_page.dart';
 import '../features/workouts/presentation/progress_page.dart';
 import '../features/workouts/presentation/workouts_page.dart';
@@ -30,9 +31,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = client?.auth.currentSession != null;
       final location = state.matchedLocation;
       final isAuthRoute = location == '/login' || location == '/register';
-      final isProfileRoute = location == '/profile-setup';
+      final isProfileSetupRoute = location == '/profile-setup';
       final isProtectedRoute = {
-        '/home', '/workouts', '/progress', '/nutrition', '/nutrition-coach', '/foods', '/biometrics'
+        '/home', '/profile', '/workouts', '/progress', '/nutrition', '/nutrition-coach', '/foods', '/biometrics'
       }.contains(location);
 
       if (!isAuthenticated) return isAuthRoute ? null : '/login';
@@ -40,7 +41,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
         return hasProfile ? '/home' : '/profile-setup';
       }
-      if (isProfileRoute) {
+      if (isProfileSetupRoute) {
         final hasProfile = await ref.read(profileRepositoryProvider).hasCurrentProfile();
         return hasProfile ? '/home' : null;
       }
@@ -54,6 +55,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (_, __) => const LoginPage()),
       GoRoute(path: '/register', builder: (_, __) => const RegisterPage()),
       GoRoute(path: '/profile-setup', builder: (_, __) => const ProfileSetupPage()),
+      GoRoute(path: '/profile', builder: (_, __) => const ProfilePage()),
       GoRoute(path: '/home', builder: (_, __) => const HomePage()),
       GoRoute(path: '/workouts', builder: (_, __) => const WorkoutsPage()),
       GoRoute(path: '/progress', builder: (_, __) => const ProgressPage()),
