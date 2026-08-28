@@ -112,23 +112,23 @@ class _DemoPreviewPageState extends State<DemoPreviewPage> {
 
   List<NavigationRailDestination> get _railDestinations => [
     NavigationRailDestination(
-      icon: Icon(Icons.grid_view_rounded),
+      icon: const Icon(Icons.grid_view_rounded),
       label: Text(_strings.home),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.fitness_center_rounded),
+      icon: const Icon(Icons.fitness_center_rounded),
       label: Text(_strings.train),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.restaurant_rounded),
+      icon: const Icon(Icons.restaurant_rounded),
       label: Text(_strings.nutrition),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.insights_rounded),
+      icon: const Icon(Icons.insights_rounded),
       label: Text(_strings.progress),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.person_rounded),
+      icon: const Icon(Icons.person_rounded),
       label: Text(_strings.profile),
     ),
   ];
