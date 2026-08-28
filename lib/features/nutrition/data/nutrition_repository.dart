@@ -101,7 +101,7 @@ class NutritionRepository {
     required double fatG,
     required double fiberG,
   }) async {
-    await _client.from('nutrition_targets').upsert({
+    final row = await _client.from('nutrition_targets').upsert({
       'user_id': _userId,
       'effective_from': _dateOnly(effectiveFrom),
       'calories': calories,
@@ -109,7 +109,10 @@ class NutritionRepository {
       'carbs_g': carbsG,
       'fat_g': fatG,
       'fiber_g': fiberG,
-    }, onConflict: 'user_id,effective_from');
+    }, onConflict: 'user_id,effective_from').select('id').maybeSingle();
+    if (row == null) {
+      throw StateError('Nutrition target was not saved.');
+    }
   }
 
   Future<void> addFood({
@@ -122,25 +125,47 @@ class NutritionRepository {
     required double fatG,
     required String servingSize,
   }) async {
-    await _client.from('nutrition_logs').insert({
+    final row = await _client.from('nutrition_logs').insert({
       'user_id': _userId,
       'consumed_at': consumedAt.toUtc().toIso8601String(),
-      'meal_type': mealType,
+      'meal_type': _mealTypeForStorage(mealType),
       'food_name': foodName.trim(),
       'calories': calories,
       'protein_g': proteinG,
       'carbs_g': carbsG,
       'fat_g': fatG,
       'serving_size': servingSize.trim(),
-    });
+    }).select('id').maybeSingle();
+    if (row == null) {
+      throw StateError('Food entry was not saved.');
+    }
   }
 
   Future<void> deleteFood(String id) async {
-    await _client
+    final row = await _client
         .from('nutrition_logs')
         .delete()
         .eq('id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', _userId)
+        .select('id')
+        .maybeSingle();
+    if (row == null) {
+      throw StateError('Food entry was not found.');
+    }
+  }
+
+  static const _mealTypes = {
+    'breakfast',
+    'lunch',
+    'dinner',
+    'snack',
+    'pre_workout',
+    'post_workout',
+  };
+
+  static String _mealTypeForStorage(String mealType) {
+    final normalized = mealType.trim().toLowerCase().replaceAll(' ', '_');
+    return _mealTypes.contains(normalized) ? normalized : 'snack';
   }
 
   static String _dateOnly(DateTime date) =>

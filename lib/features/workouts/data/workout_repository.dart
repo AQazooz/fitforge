@@ -7,7 +7,10 @@ class WorkoutRepository {
 
   Future<String> ensureStarterPlan() async {
     final result = await _client.rpc('create_starter_workout_plan');
-    return result as String;
+    if (result is! String || result.isEmpty) {
+      throw StateError('Starter workout plan was not created.');
+    }
+    return result;
   }
 
   Future<List<Map<String, dynamic>>> getPlans() async {
@@ -50,9 +53,12 @@ class WorkoutRepository {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw StateError('No authenticated user.');
 
+    final values = <String, dynamic>{'user_id': userId};
+    if (planId != null) values['plan_id'] = planId;
+
     final row = await _client
         .from('workout_logs')
-        .insert({'user_id': userId, 'plan_id': planId})
+        .insert(values)
         .select('id')
         .single();
     return row['id'] as String;
@@ -68,7 +74,7 @@ class WorkoutRepository {
     int? durationSeconds,
     String? notes,
   }) async {
-    await _client.from('workout_log_sets').insert({
+    final row = await _client.from('workout_log_sets').insert({
       'workout_log_id': workoutLogId,
       'exercise_id': exerciseId,
       'set_number': setNumber,
@@ -77,16 +83,31 @@ class WorkoutRepository {
       'rir': rir,
       'duration_seconds': durationSeconds,
       'notes': notes,
-    });
+    }).select('id').maybeSingle();
+    if (row == null) {
+      throw StateError('Workout set was not saved.');
+    }
   }
 
   Future<void> completeSession(String workoutLogId, {String? notes}) async {
-    await _client
+    final row = await _client
         .from('workout_logs')
         .update({
           'completed_at': DateTime.now().toUtc().toIso8601String(),
           'notes': notes,
         })
-        .eq('id', workoutLogId);
+        .eq('id', workoutLogId)
+        .eq('user_id', _currentUserId())
+        .select('id')
+        .maybeSingle();
+    if (row == null) {
+      throw StateError('Workout session was not found.');
+    }
+  }
+
+  String _currentUserId() {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw StateError('No authenticated user.');
+    return userId;
   }
 }
