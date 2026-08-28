@@ -13,7 +13,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: FitForgeTheme.dark,
-        home: const FitForgePage(child: SizedBox(key: Key('content'))),
+        home: const FitForgePage(
+          child: SizedBox(width: double.infinity, key: Key('content')),
+        ),
       ),
     );
     expect(tester.getTopLeft(find.byKey(const Key('content'))).dx, 16);
@@ -27,18 +29,29 @@ void main() {
   testWidgets(
     'demo preview switches navigation for compact and wide screens',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(390, 800));
       await tester.pumpWidget(
-        MaterialApp(theme: FitForgeTheme.dark, home: const DemoPreviewPage()),
+        MaterialApp(
+          theme: FitForgeTheme.dark,
+          home: MediaQuery(
+            data: const MediaQueryData(size: Size(390, 800)),
+            child: const DemoPreviewPage(),
+          ),
+        ),
       );
       expect(find.byType(NavigationBar), findsOneWidget);
       expect(find.byType(NavigationRail), findsNothing);
 
-      await tester.binding.setSurfaceSize(const Size(1200, 800));
-      await tester.pump();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: FitForgeTheme.dark,
+          home: MediaQuery(
+            data: const MediaQueryData(size: Size(1200, 800)),
+            child: const DemoPreviewPage(),
+          ),
+        ),
+      );
       expect(find.byType(NavigationRail), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
-      addTearDown(() => tester.binding.setSurfaceSize(null));
     },
   );
 }
