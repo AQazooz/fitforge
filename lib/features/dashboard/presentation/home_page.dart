@@ -305,10 +305,7 @@ class _Actions extends StatelessWidget {
   Widget build(BuildContext context) => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      _Heading(
-        title: 'Quick access',
-        subtitle: 'Everything you need today',
-      ),
+      _Heading(title: 'Quick access', subtitle: 'Everything you need today'),
       SizedBox(height: 14),
       _Action(
         icon: Icons.fitness_center_rounded,
