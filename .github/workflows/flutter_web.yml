@@ -2,17 +2,16 @@ name: FitForge Web Preview
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, 'codex/**']
+  pull_request:
+    branches: [main, 'codex/fitforge-design-phase-2']
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: web-preview-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -39,23 +38,16 @@ jobs:
       - name: Analyze
         run: flutter analyze
 
-      - name: Build Web
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      - name: Build Web preview
         run: |
           flutter build web --release \
-            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
-            --dart-define=SUPABASE_PUBLISHABLE_KEY="$SUPABASE_PUBLISHABLE_KEY"
+            --base-href "/FitForge/" \
+            --dart-define=FITFORGE_DEMO_MODE=true
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload web preview artifact
+        uses: actions/upload-artifact@v4
         with:
+          name: fitforge-web-preview-${{ github.sha }}
           path: build/web
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          if-no-files-found: error
+          retention-days: 14

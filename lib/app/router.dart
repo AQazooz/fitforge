@@ -24,6 +24,39 @@ final profileRepositoryProvider = Provider<ProfileRepository>(
   (ref) => ProfileRepository(SupabaseConfig.client!),
 );
 
+Future<String?> appRedirect({
+  required String location,
+  required bool isAuthenticated,
+  required bool demoMode,
+  Future<bool> Function()? hasProfile,
+}) async {
+  if (location == '/demo') return demoMode ? null : '/login';
+  final isAuthRoute = location == '/login' || location == '/register';
+  final isProfileRoute = location == '/profile-setup';
+  final isProtectedRoute = {
+    '/home',
+    '/workouts',
+    '/progress',
+    '/nutrition',
+    '/nutrition-coach',
+    '/foods',
+    '/biometrics',
+    '/profile',
+  }.contains(location);
+
+  if (!isAuthenticated) return isAuthRoute ? null : '/login';
+  if (isAuthRoute) {
+    return await hasProfile!() ? '/home' : '/profile-setup';
+  }
+  if (isProfileRoute) {
+    return await hasProfile!() ? '/home' : null;
+  }
+  if (isProtectedRoute) {
+    return await hasProfile!() ? null : '/profile-setup';
+  }
+  return '/home';
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refresh = _AuthRefreshNotifier();
   final router = GoRouter(
@@ -32,41 +65,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) async {
       final client = SupabaseConfig.client;
       final isAuthenticated = client?.auth.currentSession != null;
-      final location = state.matchedLocation;
-      if (location == '/demo') return AppEnv.demoMode ? null : '/login';
-      final isAuthRoute = location == '/login' || location == '/register';
-      final isProfileRoute = location == '/profile-setup';
-      final isProtectedRoute = {
-        '/home',
-        '/workouts',
-        '/progress',
-        '/nutrition',
-        '/nutrition-coach',
-        '/foods',
-        '/biometrics',
-        '/profile',
-      }.contains(location);
-
-      if (!isAuthenticated) return isAuthRoute ? null : '/login';
-      if (isAuthRoute) {
-        final hasProfile = await ref
+      return appRedirect(
+        location: state.matchedLocation,
+        isAuthenticated: isAuthenticated,
+        demoMode: AppEnv.demoMode,
+        hasProfile: () => ref
             .read(profileRepositoryProvider)
-            .hasCurrentProfile();
-        return hasProfile ? '/home' : '/profile-setup';
-      }
-      if (isProfileRoute) {
-        final hasProfile = await ref
-            .read(profileRepositoryProvider)
-            .hasCurrentProfile();
-        return hasProfile ? '/home' : null;
-      }
-      if (isProtectedRoute) {
-        final hasProfile = await ref
-            .read(profileRepositoryProvider)
-            .hasCurrentProfile();
-        return hasProfile ? null : '/profile-setup';
-      }
-      return '/home';
+            .hasCurrentProfile(),
+      );
     },
     routes: [
       GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
@@ -92,8 +98,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/foods', builder: (_, _) => const FoodSearchPage()),
       GoRoute(path: '/biometrics', builder: (_, _) => const BiometricsPage()),
     ],
-    errorBuilder: (_, state) =>
-        Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
+    errorBuilder: (_, state) => Scaffold(
+      body: Center(
+        child: Semantics(
+          container: true,
+          liveRegion: true,
+          label: 'خطأ في التنقل',
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'تعذر العثور على هذه الصفحة\n${state.uri}',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    ),
   );
 
   ref.onDispose(() {
