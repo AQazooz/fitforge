@@ -12,7 +12,7 @@ class SupabaseConfig {
 
     await Supabase.initialize(
       url: AppEnv.supabaseUrl,
-      anonKey: AppEnv.supabasePublishableKey,
+      publishableKey: AppEnv.supabasePublishableKey,
     );
   }
 
