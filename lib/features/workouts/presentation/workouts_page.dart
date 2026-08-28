@@ -157,7 +157,9 @@ class _WorkoutSessionPageState extends ConsumerState<WorkoutSessionPage> {
   void dispose() {
     for (final sets in _fields.values) {
       for (final set in sets) {
-        for (final controller in set.values) controller.dispose();
+        for (final controller in set.values) {
+          controller.dispose();
+        }
       }
     }
     super.dispose();
